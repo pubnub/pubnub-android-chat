@@ -1,0 +1,38 @@
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:weightSum="1">
+
+        <!-- The main content view -->
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.57"
+            android:orientation="vertical"
+            android:weightSum="1">
+
+            <TextView
+                android:layout_width="fill_parent"
+                android:layout_height="47dp"
+                android:layout_weight="0.12"
+                android:text="@string/presence_room_title_presence_fragment" />
+
+            <FrameLayout
+                android:id="@+id/rooms_fragment_frame"
+                android:layout_width="fill_parent"
+                android:layout_height="142dp" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+
+
+</android.support.v4.widget.DrawerLayout>
+
