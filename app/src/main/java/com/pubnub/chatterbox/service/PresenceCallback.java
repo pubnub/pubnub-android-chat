@@ -59,10 +59,11 @@ public class PresenceCallback extends Callback {
 
                     targetProfile = new UserProfile();
                     targetProfile.setId(messageJSON.getString("uuid"));
+
                     globalPresenceList.put(uuid, targetProfile);
                     //Get the state of the user...don't rely on state being a part of the join event.
 
-                    if(!messageJSON.has("date")) {
+                    if(!messageJSON.has("data")) {
                         pubnub.getState(channel, uuid, this);
                     }
 

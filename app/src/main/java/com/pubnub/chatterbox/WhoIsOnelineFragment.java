@@ -2,11 +2,19 @@ package com.pubnub.chatterbox;
 
 import android.app.Activity;
 import android.app.ListFragment;
+import android.content.ComponentName;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 
+import com.pubnub.chatterbox.domain.ChatterBoxPresenceMessage;
+import com.pubnub.chatterbox.domain.ChatterBoxPrivateChatRequest;
 import com.pubnub.chatterbox.domain.UserProfile;
+import com.pubnub.chatterbox.service.ChatterBoxService;
+import com.pubnub.chatterbox.service.DefaultLChatterBoxCallback;
 
 import java.util.ArrayList;
 
@@ -21,10 +29,51 @@ public class WhoIsOnelineFragment extends ListFragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
     private ArrayList<UserProfile> whosOnline = new ArrayList<>();
+    private WhoIsOnlineArrayAdapter mWhosOnlineArrayAdapter;
 
+
+    private ChatterBoxService.ChatterBoxClient chatterBoxServiceClient;
+    private UserProfile currentUserProfile;
+
+
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            chatterBoxServiceClient = (ChatterBoxService.ChatterBoxClient) service;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Log.d(Constants.LOGT, "disconnecting from service");
+        }
+    };
+
+
+    //CALLBACK FOR PRESENCE
+    //The personal channel is used to send commands to an individual, such as
+    //group chat and personal chat.
+    private DefaultLChatterBoxCallback personalListener = new DefaultLChatterBoxCallback() {
+
+        @Override
+        public void onPresence(final ChatterBoxPresenceMessage pmessage) {
+            try{
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.d(Constants.LOGT,"Presence event triggered");
+                        mWhosOnlineArrayAdapter.add(pmessage.getTargetProfile());
+                    }
+                });
+
+
+            }catch (Exception e){
+                Log.e(Constants.LOGT,"Exception while executing presence callback");
+            }
+
+        }
+
+    };
 
     private OnFragmentInteractionListener mListener;
 
@@ -36,7 +85,7 @@ public class WhoIsOnelineFragment extends ListFragment {
     }
 
     // TODO: Rename and change types of parameters
-    public static WhoIsOnelineFragment newInstance(String param1, String param2) {
+    public static WhoIsOnelineFragment newInstance() {
         WhoIsOnelineFragment fragment = new WhoIsOnelineFragment();
         return fragment;
     }
@@ -45,10 +94,8 @@ public class WhoIsOnelineFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
-        // TODO: Change Adapter to display your content
-        setListAdapter(new WhoIsOnlineArrayAdapter(getActivity(), whosOnline));
-
+        mWhosOnlineArrayAdapter = new WhoIsOnlineArrayAdapter(getActivity(),whosOnline);
+       setListAdapter(mWhosOnlineArrayAdapter);
     }
 
 

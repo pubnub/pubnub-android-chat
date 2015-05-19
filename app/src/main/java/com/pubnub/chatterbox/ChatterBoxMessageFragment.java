@@ -20,33 +20,24 @@ import com.pubnub.chatterbox.domain.ChatterBoxMessage;
 import com.pubnub.chatterbox.domain.ChatterBoxPrivateChatRequest;
 import com.pubnub.chatterbox.domain.UserProfile;
 import com.pubnub.chatterbox.service.ChatterBoxService;
-import com.pubnub.chatterbox.service.DefaultLChatterBoxListener;
+import com.pubnub.chatterbox.service.DefaultLChatterBoxCallback;
 
 import java.util.ArrayList;
 
-/**
- * A fragment representing a list of Items.
- * <p/>
- * Large screen devices (such as tablets) are supported by replacing the ListView
- * with a GridView.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
- * interface.
- */
 public class ChatterBoxMessageFragment extends Fragment implements AbsListView.OnItemClickListener {
 
 
     private ArrayList<ChatterBoxMessage> chatterMessageArray = new ArrayList<>();
     private ChatterBoxService.ChatterBoxClient chatterBoxServiceClient;
     private UserProfile currentUserProfile;
-    private OnFragmentInteractionListener mListener;
     /**
      * The fragment's ListView/GridView.
      */
     private AbsListView mListView;
+
     //The personal channel is used to send commands to an individual, such as
     //group chat and personal chat.
-    private DefaultLChatterBoxListener personalListener = new DefaultLChatterBoxListener() {
+    private DefaultLChatterBoxCallback personalListener = new DefaultLChatterBoxCallback() {
 
         @Override
         public void onPrivateChatRequest(ChatterBoxPrivateChatRequest message) {
@@ -54,6 +45,8 @@ public class ChatterBoxMessageFragment extends Fragment implements AbsListView.O
         }
 
     };
+
+
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -73,10 +66,11 @@ public class ChatterBoxMessageFragment extends Fragment implements AbsListView.O
      * Views.
      */
     private ChatMessageListArrayAdapter mAdapter;
+
     //This is the global channel listener for the app. Mostly the global channel
     //is a channel everyone subscribes to. This allows you to track presence and state
     //of users across the spectrum
-    private DefaultLChatterBoxListener globalListener = new DefaultLChatterBoxListener() {
+    private DefaultLChatterBoxCallback globalListener = new DefaultLChatterBoxCallback() {
 
         @Override
         public void onMessage(ChatterBoxMessage message) {
@@ -106,7 +100,7 @@ public class ChatterBoxMessageFragment extends Fragment implements AbsListView.O
     public ChatterBoxMessageFragment() {
     }
 
-    // TODO: Rename and change types of parameters
+
     public static ChatterBoxMessageFragment newInstance(UserProfile userProfile) {
         ChatterBoxMessageFragment fragment = new ChatterBoxMessageFragment();
         fragment.setCurrentUserProfile(userProfile);
@@ -119,6 +113,7 @@ public class ChatterBoxMessageFragment extends Fragment implements AbsListView.O
         this.currentUserProfile = profile;
     }
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -127,6 +122,12 @@ public class ChatterBoxMessageFragment extends Fragment implements AbsListView.O
         mAdapter = new ChatMessageListArrayAdapter(getActivity()
                 , R.layout.chat_message_item,
                 chatterMessageArray);
+
+
+        //Bind to the ChatterBox service.
+
+        Intent chatterBoxServiceIntent = new Intent(getActivity(), ChatterBoxService.class);
+        getActivity().bindService(chatterBoxServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
 
@@ -149,32 +150,16 @@ public class ChatterBoxMessageFragment extends Fragment implements AbsListView.O
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        try {
-            mListener = (OnFragmentInteractionListener) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
-
-        //Bind to the ChatterBox service.
-        Intent chatterBoxServiceIntent = new Intent(activity, ChatterBoxService.class);
-        activity.bindService(chatterBoxServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
-
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (null != mListener) {
-            // Notify the active callbacks interface (the activity, if the
-            // fragment is attached to one) that an item has been selected.
-            //mListener.onFragmentInteraction(chatterMessageArray.get(position).getMessageId());
-        }
+
     }
 
     /**
@@ -190,19 +175,6 @@ public class ChatterBoxMessageFragment extends Fragment implements AbsListView.O
         }
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        public void onFragmentInteraction(String id);
-    }
+
 
 }

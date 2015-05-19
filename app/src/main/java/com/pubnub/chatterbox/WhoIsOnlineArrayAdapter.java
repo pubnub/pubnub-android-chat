@@ -5,8 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 
 import com.pubnub.chatterbox.domain.UserProfile;
+
+import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -30,6 +33,14 @@ public class WhoIsOnlineArrayAdapter extends ArrayAdapter<UserProfile> {
             returnedView = inflator.inflate(R.layout.whos_online_item, null);
         }
 
+
+        TextView txtUserName = (TextView)returnedView.findViewById(R.id.username);
+        TextView txtFormatted = (TextView)returnedView.findViewById(R.id.formattedName);
+
+        UserProfile p = getItem(position);
+        String formattedName = p.getLastName() + ", " + p.getFirstName();
+        txtFormatted.setText(formattedName);
+        txtUserName.setText(p.getUserName());
 
         return returnedView;
     }

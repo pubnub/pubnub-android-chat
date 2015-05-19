@@ -4,13 +4,15 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+
 import android.preference.PreferenceManager;
-import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,12 +20,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.AdapterView;
+import android.widget.ListView;
+
+
+
+
+
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
  * See the <a href="https://developer.android.com/design/patterns/navigation-drawer.html#Interaction">
  * design guidelines</a> for a complete explanation of the behaviors implemented here.
  */
-public class PresenceFragment extends Fragment {
+public class ChatterboxPresenceFragment extends Fragment {
 
     /**
      * Remember the position of the selected item.
@@ -53,8 +62,10 @@ public class PresenceFragment extends Fragment {
     private int mCurrentSelectedPosition = 0;
     private boolean mFromSavedInstanceState;
     private boolean mUserLearnedDrawer;
+    private ListView mDrawerListView;
 
-    public PresenceFragment() {
+
+    public ChatterboxPresenceFragment() {
     }
 
     @Override
@@ -86,20 +97,18 @@ public class PresenceFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View panel = inflater.inflate(R.layout.fragment_presence_drawer, container, false);
+
+        mDrawerListView = (ListView)inflater.inflate(R.layout.fragment_drawer_item, container, false);
 
 
-
-
-
-
-        /*mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 selectItem(position);
             }
         });
-        mDrawerListView.setAdapter(new ArrayAdapter<String>(
+
+        mDrawerListView.setAdapter(new android.widget.ArrayAdapter<String>(
                 getActionBar().getThemedContext(),
                 android.R.layout.simple_list_item_activated_1,
                 android.R.id.text1,
@@ -109,9 +118,10 @@ public class PresenceFragment extends Fragment {
                         ""
                 }));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
-        return mDrawerListView; **/
 
-        return (mDrawerLayout);
+
+        return mDrawerListView;
+
     }
 
     public boolean isDrawerOpen() {
@@ -132,19 +142,21 @@ public class PresenceFragment extends Fragment {
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         // set up the drawer's list view with items and click listener
 
+
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 
         // ActionBarDrawerToggle ties together the the proper interactions
         // between the navigation drawer and the action bar app icon.
-        mDrawerToggle = new ActionBarDrawerToggle(
-                getActivity(),                    /* host Activity */
-                mDrawerLayout,                    /* DrawerLayout object */
-                R.drawable.ic_drawer,             /* nav drawer image to replace 'Up' caret */
-                R.string.navigation_drawer_open,  /* "open drawer" description for accessibility */
-                R.string.navigation_drawer_close  /* "close drawer" description for accessibility */
-        ) {
+
+
+        mDrawerToggle = new ActionBarDrawerToggle(getActivity(),
+                                                  mDrawerLayout,
+                                                  R.string.navigation_drawer_open,
+                                                  R.string.navigation_drawer_close)
+
+        {
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);

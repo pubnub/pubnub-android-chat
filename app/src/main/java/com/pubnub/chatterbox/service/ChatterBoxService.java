@@ -17,9 +17,11 @@ import com.pubnub.chatterbox.domain.UserProfile;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class ChatterBoxService extends Service {
 
@@ -87,6 +89,48 @@ public class ChatterBoxService extends Service {
             return ChatterBoxClient.this;
         }
 
+        public void publish(String channel, ChatterBoxMessage message){
+           try {
+               JSONObject messageJSON = new JSONObject();
+               messageJSON.put(ChatterBoxMessage.DEVICETAG, message.getDeviceTag());
+               messageJSON.put(ChatterBoxMessage.SENDERUUID, pubnub.getUUID()); //Set the uuid
+               messageJSON.put(ChatterBoxMessage.EMOTICON, "");
+               messageJSON.put(ChatterBoxMessage.FROM, message.getFrom());
+               messageJSON.put(ChatterBoxMessage.SENTON, new Date());
+               messageJSON.put(ChatterBoxMessage.TYPE,message.getType());
+               messageJSON.put(ChatterBoxMessage.MESSAGECONTENT,message.getMessageContent());
+
+
+               pubnub.publish(channel, messageJSON, true, new Callback() {
+                   @Override
+                   public void successCallback(String channel, Object message) {
+                      Log.d(Constants.LOGT, "successful publish");
+                   }
+               });
+           }catch(Exception e){
+
+           }
+        }
+
+
+        public void history(String channel){
+
+            long startTime = new Date().getTime() * 1000;
+            long endTime = new Date().getTime() * 1000;
+
+            pubnub.history(channel, true, 50, new Callback(){
+
+                @Override
+                public void successCallback(String channel, Object message) {
+                    Log.d(Constants.LOGT, "successful history call");
+
+                }
+
+
+            });
+        }
+
+
         public void addRoom(final String roomName, final ChatterBoxCallback listener) {
             if (initialized) {
                 boolean bfound = false;
@@ -111,6 +155,7 @@ public class ChatterBoxService extends Service {
                                         if (messageType.equals("chattmessage")) {
 
                                             ChatterBoxMessage msg = ChatterBoxMessage.create(jmessage, timetoken);
+
                                             List<ChatterBoxCallback> thisRoomListeners = listeners.get(roomName);
                                             for (ChatterBoxCallback l : thisRoomListeners) {
                                                 l.onMessage(msg);
@@ -148,7 +193,7 @@ public class ChatterBoxService extends Service {
                         //Set up the Presence on this Room
                         pubnub.presence(roomName, new PresenceCallback(l, pubnub, globalPresenceCache));
 
-                       
+
                     } catch (Exception e) {
                         //TODO: handle this exception so that the app continues to function
                         Log.e(Constants.LOGT, "exception while adding subscription", e);
@@ -196,7 +241,7 @@ public class ChatterBoxService extends Service {
             pubnub.setHeartbeatInterval(30);
             pubnub.setResumeOnReconnect(true);
             pubnub.setSubscribeTimeout(20000);
-            //pubnub.setUUID(userProfile.getEmail()); //You can set a custom UUID or let the SDK generate one for you
+            pubnub.setUUID(userProfile.getEmail()); //You can set a custom UUID or let the SDK generate one for you
             initialized = true;
 
             //disable push
@@ -217,7 +262,7 @@ public class ChatterBoxService extends Service {
             //If I want to enable push this is where I will do it. For each channel I am
             //subscribed to I will enablePushNotifications.
             if (enablePush) {
-                //pubnub.enablePushNotificationsOnChannels(channels);
+               // pubnub.enablePushNotificationsOnChannels(channels);
             }
 
             return false;
