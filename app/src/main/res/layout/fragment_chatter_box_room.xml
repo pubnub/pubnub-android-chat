@@ -1,0 +1,30 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.pubnub.chatterbox.fragments.ChatterBoxRoomFragment">
+
+
+
+     <FrameLayout
+            android:id="@+id/message_display_fragment_container"
+            android:layout_gravity="center"
+            android:layout_width="fill_parent"
+            android:layout_height="450dp"
+            android:fillViewport="true"
+            android:layout_alignParentStart="true"
+            android:layout_above="@+id/message_input_fragment_container"/>
+
+
+
+    <FrameLayout
+        android:padding="2dp"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/message_input_fragment_container"
+        android:layout_gravity="bottom"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true" />
+
+
+</RelativeLayout>

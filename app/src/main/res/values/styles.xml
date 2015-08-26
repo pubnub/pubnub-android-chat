@@ -1,8 +1,29 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="@style/Theme.AppCompat.Light">
-        <!-- Customize your theme here. -->
+    <style name="AppTheme" parent="android:style/Theme.Material.Light.DarkActionBar">
+        <item name="android:actionBarStyle">@style/chatterBoxActionBarTheme</item>
+        <item name="android:toolbarStyle">@style/chatterBoxToolbarStyle</item>
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowActionBar">true</item>
+        <item name="android:windowNoTitle">true</item>
     </style>
+
+
+    <style name="chatterBoxActionBarTheme">
+        <item name="android:background">@color/MainBackgroundColor500</item>
+        <item name="android:actionBarSize">40dp</item>
+    </style>
+
+
+    <style name="chatterBoxToolbarStyle">
+        <item name="android:background">@color/MainBackgroundColor500</item>
+    </style>
+
+    <color name="MainBackgroundColor500">#f44336</color>
+    <color name="colorPrimaryDark">#f44336</color>
+
+
+
 
 </resources>

@@ -1,4 +1,4 @@
-package com.pubnub.chatterbox;
+package com.pubnub.chatterbox.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -14,13 +14,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.pubnub.chatterbox.ChatMessageListArrayAdapter;
+import com.pubnub.chatterbox.Constants;
+import com.pubnub.chatterbox.R;
 import com.pubnub.chatterbox.domain.ChatterBoxMessage;
-import com.pubnub.chatterbox.domain.ChatterBoxPrivateChatRequest;
 import com.pubnub.chatterbox.domain.UserProfile;
 import com.pubnub.chatterbox.service.ChatterBoxService;
 import com.pubnub.chatterbox.service.DefaultLChatterBoxCallback;
+import com.pubnub.chatterbox.service.binder.ChatterBoxClient;
 
 import java.util.ArrayList;
 
@@ -28,49 +32,25 @@ public class ChatterBoxMessageFragment extends Fragment implements AbsListView.O
 
 
     private ArrayList<ChatterBoxMessage> chatterMessageArray = new ArrayList<>();
-    private ChatterBoxService.ChatterBoxClient chatterBoxServiceClient;
+    private ChatterBoxClient chatterBoxServiceClient;
     private UserProfile currentUserProfile;
+
+    private String roomName;
+
     /**
      * The fragment's ListView/GridView.
      */
     private AbsListView mListView;
-
-    //The personal channel is used to send commands to an individual, such as
-    //group chat and personal chat.
-    private DefaultLChatterBoxCallback personalListener = new DefaultLChatterBoxCallback() {
-
-        @Override
-        public void onPrivateChatRequest(ChatterBoxPrivateChatRequest message) {
-            Log.d(Constants.LOGT, "private chat request received");
-        }
-
-    };
+    private ScrollView mMessageScrollView;
 
 
-    private ServiceConnection serviceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            chatterBoxServiceClient = (ChatterBoxService.ChatterBoxClient) service;
-            if (chatterBoxServiceClient.isConnected() == false) {
-                chatterBoxServiceClient.connect(currentUserProfile, globalListener, personalListener);
-            }
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            Log.d(Constants.LOGT, "disconnecting from service");
-        }
-    };
     /**
      * The Adapter which will be used to populate the ListView/GridView with
      * Views.
      */
     private ChatMessageListArrayAdapter mAdapter;
 
-    //This is the global channel listener for the app. Mostly the global channel
-    //is a channel everyone subscribes to. This allows you to track presence and state
-    //of users across the spectrum
-    private DefaultLChatterBoxCallback globalListener = new DefaultLChatterBoxCallback() {
+    private DefaultLChatterBoxCallback roomListener = new DefaultLChatterBoxCallback() {
 
         @Override
         public void onMessage(ChatterBoxMessage message) {
@@ -93,6 +73,25 @@ public class ChatterBoxMessageFragment extends Fragment implements AbsListView.O
     };
 
 
+
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            chatterBoxServiceClient = (ChatterBoxClient) service;
+            if (chatterBoxServiceClient.isConnected() == false) {
+                chatterBoxServiceClient.connect(currentUserProfile);
+            }
+
+            chatterBoxServiceClient.addRoom(roomName, roomListener);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Log.d(Constants.LOGT, "disconnecting from service");
+        }
+    };
+
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -101,9 +100,10 @@ public class ChatterBoxMessageFragment extends Fragment implements AbsListView.O
     }
 
 
-    public static ChatterBoxMessageFragment newInstance(UserProfile userProfile) {
+    public static ChatterBoxMessageFragment newInstance(UserProfile userProfile, String roomName) {
         ChatterBoxMessageFragment fragment = new ChatterBoxMessageFragment();
         fragment.setCurrentUserProfile(userProfile);
+        fragment.setRoomName(roomName);
         return fragment;
     }
 
@@ -124,10 +124,6 @@ public class ChatterBoxMessageFragment extends Fragment implements AbsListView.O
                 chatterMessageArray);
 
 
-        //Bind to the ChatterBox service.
-
-        Intent chatterBoxServiceIntent = new Intent(getActivity(), ChatterBoxService.class);
-        getActivity().bindService(chatterBoxServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
 
@@ -149,18 +145,32 @@ public class ChatterBoxMessageFragment extends Fragment implements AbsListView.O
 
     @Override
     public void onAttach(Activity activity) {
+
         super.onAttach(activity);
+        Intent chatterBoxServiceIntent = new Intent(getActivity(), ChatterBoxService.class);
+        getActivity().bindService(chatterBoxServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
+
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
+        chatterBoxServiceClient.removeRoomListener(this.roomName,roomListener);
+        getActivity().unbindService(serviceConnection);
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
     }
+
+
+
+
+    public void setRoomName(String roomName) {
+        this.roomName = roomName;
+    }
+
 
     /**
      * The default content for this Fragment has a TextView that is shown when
@@ -174,7 +184,6 @@ public class ChatterBoxMessageFragment extends Fragment implements AbsListView.O
             ((TextView) emptyView).setText(emptyText);
         }
     }
-
 
 
 }

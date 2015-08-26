@@ -19,6 +19,8 @@ public interface ChatterBoxCallback {
 
     void onMessage(ChatterBoxMessage message);
 
+    void onMessagePublished(String timeToken);
+
     void onPresence(ChatterBoxPresenceMessage pmessage);
 
     void onHeartBeat(boolean error);

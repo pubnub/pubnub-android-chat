@@ -37,7 +37,9 @@ public class ChatterBoxMessage {
 
     public static ChatterBoxMessage create() {
 
-        return new ChatterBoxMessage();
+        ChatterBoxMessage c = new ChatterBoxMessage();
+        c.setType("chatmessage");
+        return c;
     }
 
     public static ChatterBoxMessage create(JSONObject obj, String timeToken) throws Exception {

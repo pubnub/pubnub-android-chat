@@ -16,15 +16,12 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -46,7 +43,6 @@ public class ChatterBoxLogin extends PlusBaseActivity implements LoaderCallbacks
     private EditText mUserName;
     private EditText mFirstName;
     private EditText mLastName;
-
 
 
     private View mProgressView;
@@ -88,12 +84,9 @@ public class ChatterBoxLogin extends PlusBaseActivity implements LoaderCallbacks
         populateAutoComplete();
 
 
-
         mUserName = (EditText) findViewById(R.id.username);
         mFirstName = (EditText) findViewById(R.id.firstName);
         mLastName = (EditText) findViewById(R.id.lastName);
-
-
 
 
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
@@ -133,7 +126,6 @@ public class ChatterBoxLogin extends PlusBaseActivity implements LoaderCallbacks
         View focusView = null;
 
 
-
         // Check for a valid email address.
         if (TextUtils.isEmpty(email)) {
             mEmailView.setError(getString(R.string.error_field_required));
@@ -149,7 +141,6 @@ public class ChatterBoxLogin extends PlusBaseActivity implements LoaderCallbacks
         String userName = mUserName.getText().toString();
         String firstName = mFirstName.getText().toString();
         String lastName = mLastName.getText().toString();
-
 
 
         if (cancel) {
@@ -367,7 +358,7 @@ public class ChatterBoxLogin extends PlusBaseActivity implements LoaderCallbacks
         private final String mLastName;
         private Activity activity;
 
-        UserLoginTask(Activity activity, String userName, String email, String firstName, String lastName){
+        UserLoginTask(Activity activity, String userName, String email, String firstName, String lastName) {
             mEmail = email;
             mUserName = userName;
             mFirstName = firstName;
@@ -385,7 +376,6 @@ public class ChatterBoxLogin extends PlusBaseActivity implements LoaderCallbacks
             } catch (InterruptedException e) {
                 return false;
             }
-
 
 
             // TODO: register the new account here.

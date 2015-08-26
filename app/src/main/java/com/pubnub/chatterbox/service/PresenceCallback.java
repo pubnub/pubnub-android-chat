@@ -45,6 +45,7 @@ public class PresenceCallback extends Callback {
             ChatterBoxPresenceMessage presenceMessage = new ChatterBoxPresenceMessage();
             if (message instanceof JSONObject) {
                 final JSONObject messageJSON = (JSONObject) message;
+                Log.d(Constants.LOGT, messageJSON.toString(2));
 
                 String action = messageJSON.getString("action");
                 String uuid = messageJSON.getString("uuid");
@@ -61,9 +62,10 @@ public class PresenceCallback extends Callback {
                     targetProfile.setId(messageJSON.getString("uuid"));
 
                     globalPresenceList.put(uuid, targetProfile);
-                    //Get the state of the user...don't rely on state being a part of the join event.
+                    //Get the state of the user...don't rely on state
+                    //being a part of the join event.
 
-                    if(!messageJSON.has("data")) {
+                    if (!messageJSON.has("data")) {
                         pubnub.getState(channel, uuid, this);
                     }
 

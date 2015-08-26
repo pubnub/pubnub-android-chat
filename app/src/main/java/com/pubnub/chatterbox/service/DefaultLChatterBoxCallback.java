@@ -14,6 +14,11 @@ public class DefaultLChatterBoxCallback implements ChatterBoxCallback {
     }
 
     @Override
+    public void onMessagePublished(String timeToken) {
+
+    }
+
+    @Override
     public void onPresence(ChatterBoxPresenceMessage pmessage) {
 
     }

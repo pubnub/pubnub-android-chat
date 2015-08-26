@@ -1,10 +1,25 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".PubnubMainActivity">
+    tools:context=".ChatterBoxMainActivity">
 
-   <item android:id="@+id/action_presence"
-         android:showAsAction="always"
-         android:title="@string/whos_on" />
+    <item android:id="@+id/action_leave_room"
+        android:showAsAction="always"
+        android:title="@string/whos_on"
+        android:icon="@drawable/ic_whosonline"/>
+
+
+    <item android:id="@+id/action_leave_room"
+        android:showAsAction="always"
+        android:title="@string/view_history"
+        android:icon="@drawable/ic_viewhistory"/>
+
+
+    <item android:id="@+id/action_leave_room"
+        android:showAsAction="always"
+        android:title="@string/leave_room"
+        android:icon="@drawable/ic_leaveroom"/>
+
+
 
 
 </menu>

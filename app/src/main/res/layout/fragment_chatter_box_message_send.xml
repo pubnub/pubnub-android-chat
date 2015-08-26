@@ -1,34 +1,28 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.pubnub.chatterbox.ChatterBoxMessageSendFragment">
+
+<RelativeLayout
+    android:id="@+id/main_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="75dp">
 
 
-    <LinearLayout android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="4">
 
-        <EditText       android:id="@+id/message"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:gravity="top"
-            android:layout_weight="1"
-            />
+        <EditText android:id="@+id/message"
+                  android:layout_width="300dp"
+                  android:layout_height="fill_parent"
+                  android:background="@android:color/white"/>
 
-        <Button android:id="@+id/sendMessageButton"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_weight="4"
-            android:text="Send"/>
+        <ImageButton
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:id="@+id/send_a_message"
+            android:background="@drawable/ic_send_mr"
+            android:alpha="1"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/message"
+            android:clickable="true"
+            android:elevation="5dp"
+            android:enabled="true" />
 
-    </LinearLayout>
+</RelativeLayout>
 
-    <ProgressBar
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/progressBar"
-        android:layout_gravity="right|center_vertical" />
-
-</FrameLayout>

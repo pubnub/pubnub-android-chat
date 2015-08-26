@@ -9,8 +9,6 @@ import android.widget.TextView;
 
 import com.pubnub.chatterbox.domain.UserProfile;
 
-import org.w3c.dom.Text;
-
 import java.util.List;
 
 /**
@@ -34,8 +32,8 @@ public class WhoIsOnlineArrayAdapter extends ArrayAdapter<UserProfile> {
         }
 
 
-        TextView txtUserName = (TextView)returnedView.findViewById(R.id.username);
-        TextView txtFormatted = (TextView)returnedView.findViewById(R.id.formattedName);
+        TextView txtUserName = (TextView) returnedView.findViewById(R.id.username);
+        TextView txtFormatted = (TextView) returnedView.findViewById(R.id.formattedName);
 
         UserProfile p = getItem(position);
         String formattedName = p.getLastName() + ", " + p.getFirstName();
