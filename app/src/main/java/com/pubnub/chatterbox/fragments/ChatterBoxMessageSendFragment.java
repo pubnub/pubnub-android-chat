@@ -32,22 +32,23 @@ public class ChatterBoxMessageSendFragment extends Fragment {
     private UserProfile currentUserProfile;
     private ChatterBoxClient chatterBoxServiceClient;
     private EditText mMessageEditText;
+    private ImageButton mBtnSend;
     private String roomName;
 
 
     private DefaultLChatterBoxCallback roomListener = new DefaultLChatterBoxCallback() {
-
-
-
         @Override
         public void onMessagePublished(String timeToken) {
-            mMessageEditText.setEnabled(true);
-            mMessageEditText.setText("");
-        }
+            Log.d(Constants.LOGT, "inside: onMessagePublished for Send fragment");
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mMessageEditText.setEnabled(true);
+                    mBtnSend.setEnabled(true);
+                    mMessageEditText.setText("");
+                }
+            });
 
-        @Override
-        public void onError(String message) {
-            Log.d(Constants.LOGT, "error while listening for message");
         }
     };
 
@@ -101,18 +102,22 @@ public class ChatterBoxMessageSendFragment extends Fragment {
         super.onCreateView(inflater,container,savedInstanceState);
         // Inflate the layout for this fragment
         View messageControlsView = inflater.inflate(R.layout.fragment_chatter_box_message_send, container, false);
-        ImageButton btn = (ImageButton) messageControlsView.findViewById(R.id.send_a_message);
+        mBtnSend = (ImageButton) messageControlsView.findViewById(R.id.send_a_message);
         mMessageEditText  = (EditText) messageControlsView.findViewById(R.id.message);
-        mMessageEditText.setMaxLines(4);
-        mMessageEditText.setMinLines(1);
-        mMessageEditText.setPadding(1, 1, 1, 1);
 
 
         final String roomNameF = this.roomName;
         final EditText txtMsg = mMessageEditText;
-        btn.setOnClickListener(new View.OnClickListener() {
+        final ImageButton btn = mBtnSend;
+
+        mBtnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                CharSequence content = txtMsg.getText();
+                if((content.length() == 0) || (content.equals(""))){
+                    return;
+                }
 
                 ChatterBoxMessage message = ChatterBoxMessage.create();
                 message.setFrom(currentUserProfile.getUserName());
@@ -123,6 +128,8 @@ public class ChatterBoxMessageSendFragment extends Fragment {
                 message.setFrom(currentUserProfile.getEmail());
                 message.setSentOn(new Date());
 
+                txtMsg.setEnabled(false);
+                btn.setEnabled(false);
                 if (chatterBoxServiceClient.isConnected()) {
                     chatterBoxServiceClient.publish(roomNameF, message);
                     txtMsg.setText("");

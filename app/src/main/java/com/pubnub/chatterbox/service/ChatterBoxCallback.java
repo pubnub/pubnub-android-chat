@@ -19,7 +19,7 @@ public interface ChatterBoxCallback {
 
     void onMessage(ChatterBoxMessage message);
 
-    void onMessagePublished(String timeToken);
+    void onMessagePublished(String message);
 
     void onPresence(ChatterBoxPresenceMessage pmessage);
 

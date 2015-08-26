@@ -16,6 +16,7 @@ import com.pubnub.chatterbox.service.ChatterBoxService;
 import com.pubnub.chatterbox.service.PresenceCallback;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -59,10 +60,24 @@ public class ChatterBoxClient extends Binder {
 
             chatterBoxService.getPubNub().publish(channel,messageJSON, true, new Callback(){
                 @Override
-                public void successCallback(String channel, Object message, String timetoken) {
+                public void successCallback(String channel, Object message) {
                     List<ChatterBoxCallback> listeners = chatterBoxService.getListeners().get(channel);
+                    String status = "";
+                    String timeToken = "";
+                    String resultCode = "";
+                    try{
+                        JSONArray results = (JSONArray)message;
+                        resultCode = results.getString(0);
+                        status = results.getString(1);
+                        timeToken = results.getString(2);
+                    }catch (JSONException e){
+                        Log.d(Constants.LOGT, "Exception while attempting to process publish results.");
+                    }
+
+                    //Give the timeToken back to all listeners on that channel
+                    //make sure the callback runs on the UI thread!!!
                     for(ChatterBoxCallback chatterBoxCallback: listeners){
-                        chatterBoxCallback.onMessagePublished(timetoken);
+                        chatterBoxCallback.onMessagePublished(timeToken);
                     }
                 }
 
