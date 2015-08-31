@@ -1,4 +1,4 @@
-package com.pubnub.chatterbox;
+package com.pubnub.chatterbox.fragments;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.pubnub.chatterbox.R;
 import com.pubnub.chatterbox.domain.UserProfile;
 
 import java.util.List;

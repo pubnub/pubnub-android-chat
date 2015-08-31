@@ -23,7 +23,7 @@ import com.pubnub.chatterbox.R;
 import com.pubnub.chatterbox.domain.ChatterBoxMessage;
 import com.pubnub.chatterbox.domain.UserProfile;
 import com.pubnub.chatterbox.service.ChatterBoxService;
-import com.pubnub.chatterbox.service.DefaultLChatterBoxCallback;
+import com.pubnub.chatterbox.service.DefaultChatterBoxCallback;
 import com.pubnub.chatterbox.service.binder.ChatterBoxClient;
 
 import java.util.ArrayList;
@@ -50,7 +50,7 @@ public class ChatterBoxMessageFragment extends Fragment implements AbsListView.O
      */
     private ChatMessageListArrayAdapter mAdapter;
 
-    private DefaultLChatterBoxCallback roomListener = new DefaultLChatterBoxCallback() {
+    private DefaultChatterBoxCallback roomListener = new DefaultChatterBoxCallback() {
 
         @Override
         public void onMessage(ChatterBoxMessage message) {

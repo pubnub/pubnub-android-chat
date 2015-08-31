@@ -3,7 +3,6 @@ package com.pubnub.chatterbox.service.binder;
 import android.os.Binder;
 import android.util.Log;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;
 import com.pubnub.api.PubnubError;
@@ -19,21 +18,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by Frederick on 5/21/15.
- */
+
 public class ChatterBoxClient extends Binder {
 
-    /**
-     * reference to our service.
-     */
     private ChatterBoxService chatterBoxService;
 
     ChatterBoxClient getService() {
@@ -62,13 +55,11 @@ public class ChatterBoxClient extends Binder {
                 @Override
                 public void successCallback(String channel, Object message) {
                     List<ChatterBoxCallback> listeners = chatterBoxService.getListeners().get(channel);
-                    String status = "";
+                    //String status = "";
                     String timeToken = "";
-                    String resultCode = "";
+                    //String resultCode = "";
                     try{
                         JSONArray results = (JSONArray)message;
-                        resultCode = results.getString(0);
-                        status = results.getString(1);
                         timeToken = results.getString(2);
                     }catch (JSONException e){
                         Log.d(Constants.LOGT, "Exception while attempting to process publish results.");
@@ -98,20 +89,33 @@ public class ChatterBoxClient extends Binder {
 
 
 
-    public void history(String channel) {
+    public void history(String channel, long start, long end) {
 
 
-        long fiveMinAgo = (new Date().getTime() - (5 * 60 * 1000)) * 100000;
+        //long fiveMinAgo = (new Date().getTime() - (5 * 60 * 1000)) * 100000;
 
         //Starting Five minutes ago
-        chatterBoxService.getPubNub().history("AWG" + Constants.GLOBAL, fiveMinAgo, -1, 50, true, true, new Callback() {
+        chatterBoxService.getPubNub().history(channel,
+                start,
+                end,
+                100,
+                true, false,
+                new Callback(){
 
             @Override
             public void successCallback(String channel, Object message) {
                 try {
                     Log.d(Constants.LOGT, "successful history call");
                     JSONArray jarr = (JSONArray) message;
-                    JSONArray history = jarr.getJSONArray(1);
+
+                    JSONArray messages = (JSONArray)jarr.get(0);
+                    String oldestTimeStamp = jarr.getString(1);
+                    String newestTimeStamp = jarr.getString(2);
+
+                    for(int idx=0; idx< messages.length(); ++idx){
+                        JSONObject m = (JSONObject)messages.get(idx);
+                        ChatterBoxMessage chatterBoxMessage = ChatterBoxMessage.create(m,m.getString("timeToken"));
+                    }
                 } catch (Exception e) {
                     Log.e(Constants.LOGT, "Exception processing history", e);
                 }
@@ -121,17 +125,13 @@ public class ChatterBoxClient extends Binder {
             public void errorCallback(String message, PubnubError error) {
                 //Process error
             }
-
-
         });
-
-
     }
 
 
     public void addRoom(final String roomName, final ChatterBoxCallback listener) {
 
-        if (chatterBoxService.isInitialized()) {
+        if (chatterBoxService.isConnected()) {
             boolean bfound = false;
             String[] currentChannels = chatterBoxService.getPubNub().getSubscribedChannelsArray();
             for (String c : currentChannels) {
@@ -141,21 +141,21 @@ public class ChatterBoxClient extends Binder {
                 }
             }
 
-            if (!bfound) { //no one subscription to this room, add one AWG-Global
+            if (!bfound) { //no one subscription to this room, add one
                 try {
                     //PubNub Specific
 
                     chatterBoxService.getPubNub().subscribe(roomName, new Callback() {
                         @Override
+
                         public void successCallback(String channel, Object message, String timetoken) {
                             try {
-                                Log.d(Constants.LOGT + "-MSGCB", "received message on channel: " + channel);
-
+                                Log.d(Constants.LOGT, "received message on channel: " + channel);
                                 if (message instanceof JSONObject) {
+
                                     JSONObject jmessage = (JSONObject) message;
                                     String messageType = jmessage.getString(ChatterBoxMessage.TYPE);
                                     if (messageType.equals("chattmessage")) {
-
                                         ChatterBoxMessage msg = ChatterBoxMessage.create(jmessage, timetoken);
 
                                         //Application specific
@@ -163,12 +163,7 @@ public class ChatterBoxClient extends Binder {
                                         for (ChatterBoxCallback l : thisRoomListeners) {
                                             l.onMessage(msg);
                                         }
-
                                     }
-                                } else {
-                                    //TODO: Is this actually required...shouldn't I know
-                                    //how messages are sent?
-                                    Log.d(Constants.LOGT, "object received as " + message.getClass().getName());
                                 }
                             } catch (Exception e) {
                                 Log.e(Constants.LOGT, "Exception while processing message", e);
@@ -178,13 +173,13 @@ public class ChatterBoxClient extends Binder {
                         @Override
                         public void errorCallback(String channel, PubnubError err) {
                             Log.e(Constants.LOGT, "error processing messages" + err.toString());
-                            //TODO: Add appropriate error handler
+
                         }
                     });
 
-                    List<ChatterBoxCallback> l = null;
+                    List<ChatterBoxCallback> l;
                     if (!chatterBoxService.getListeners().containsKey(roomName)) {
-                        l = new ArrayList<ChatterBoxCallback>();
+                        l = new ArrayList<>();
                     } else {
                         l = chatterBoxService.getListeners().get(roomName);
                     }
@@ -197,14 +192,12 @@ public class ChatterBoxClient extends Binder {
 
 
                 } catch (Exception e) {
-                    //TODO: handle this exception so that the app continues to function
                     Log.e(Constants.LOGT, "exception while adding subscription", e);
-                    //TODO:MAYBE CALL THE CLIENTS ERROR HANDLER
+
                 }
 
             }
 
-            //TODO: Move this code
             List<ChatterBoxCallback> l = null;
             if (!chatterBoxService.getListeners().containsKey(roomName)) {
                 l = new ArrayList<>();
@@ -214,7 +207,6 @@ public class ChatterBoxClient extends Binder {
 
             l.add(listener); //add the listener for this room.
             chatterBoxService.getListeners().put(roomName, l);
-
 
         }
     }
@@ -242,9 +234,9 @@ public class ChatterBoxClient extends Binder {
 
     public boolean connect(UserProfile userProfile) {
 
-
-        chatterBoxService.setConnected(true);
-        chatterBoxService.setCurrentUserProfile(userProfile);
+        if(userProfile != null) {
+            chatterBoxService.setCurrentUserProfile(userProfile);
+        }
 
         return chatterBoxService.isConnected();
     }
@@ -276,31 +268,9 @@ public class ChatterBoxClient extends Binder {
     }
 
 
-    public boolean disconnect(UserProfile userProfile, boolean enablePush) {
+    /*public boolean disconnect(UserProfile userProfile, boolean enablePush) {
         String[] channels = chatterBoxService.getPubNub().getSubscribedChannelsArray();
-        //If I want to enable push this is where I will do it. For each channel I am
-        //subscribed to I will enablePushNotifications.
-        if (enablePush) {
-            try {
-                GoogleCloudMessaging gcmCloudMessaging = GoogleCloudMessaging.getInstance(chatterBoxService.getBaseContext());
-                String registrationID = gcmCloudMessaging.register(Constants.PROJECT_ID); //SENDER_ID
-                Log.d(Constants.LOGT, "enabling push for: " + registrationID);
-                chatterBoxService.getPubNub().enablePushNotificationsOnChannels(channels, registrationID);
-
-                //PAYLOAD
-                /**
-                 *  { gcm: data : { message: "some  data" } }
-                 *  { gcm: data : { message: "some  data" } }
-                 *  { cm{ //content },  gcm: data : { message: "some  data" } }
-                 */
-
-            } catch (IOException e) {
-                Log.e(Constants.LOGT, "exception while attempting to register for push notifications", e);
-            }
-        }
-
-        return false;
-    }
+    }*/
 
 
     public HashMap<String, UserProfile> getGlobalPresenceList() {

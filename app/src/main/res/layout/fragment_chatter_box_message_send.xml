@@ -1,18 +1,22 @@
 
-<RelativeLayout
+<LinearLayout
     android:id="@+id/main_content"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="75dp">
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
 
 
 
-        <EditText android:id="@+id/message"
-                  android:layout_width="300dp"
-                  android:layout_height="fill_parent"
-                  android:background="@android:color/white"/>
+    <EditText android:id="@+id/message"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@android:color/white"
+              android:layout_weight=".90"/>
 
-        <ImageButton
+
+
+    <ImageButton
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:id="@+id/send_a_message"
@@ -22,7 +26,8 @@
             android:layout_toEndOf="@+id/message"
             android:clickable="true"
             android:elevation="5dp"
-            android:enabled="true" />
+            android:enabled="true"
+            android:layout_weight=".10"/>
 
-</RelativeLayout>
+</LinearLayout>
 

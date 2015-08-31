@@ -1,4 +1,4 @@
-package com.pubnub.chatterbox;
+package com.pubnub.chatterbox.fragments;
 
 import android.app.Activity;
 import android.app.ListFragment;
@@ -12,10 +12,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 
+import com.pubnub.chatterbox.Constants;
 import com.pubnub.chatterbox.domain.ChatterBoxPresenceMessage;
 import com.pubnub.chatterbox.domain.UserProfile;
 import com.pubnub.chatterbox.service.ChatterBoxService;
-import com.pubnub.chatterbox.service.DefaultLChatterBoxCallback;
+import com.pubnub.chatterbox.service.DefaultChatterBoxCallback;
 import com.pubnub.chatterbox.service.binder.ChatterBoxClient;
 
 import java.util.ArrayList;
@@ -23,15 +24,11 @@ import java.util.ArrayList;
 
 public class WhoIsOnelineFragment extends ListFragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private ArrayList<UserProfile> whosOnline = new ArrayList<>();
     private WhoIsOnlineArrayAdapter mWhosOnlineArrayAdapter;
     private ChatterBoxClient chatterBoxServiceClient;
     private UserProfile currentUserProfile;
     private String roomChannel;
-
-
     private String roomTitle;
 
 
@@ -51,7 +48,7 @@ public class WhoIsOnelineFragment extends ListFragment {
 
 
     //CALLBACK FOR PRESENCE
-    private DefaultLChatterBoxCallback presenceListener = new DefaultLChatterBoxCallback() {
+    private DefaultChatterBoxCallback presenceListener = new DefaultChatterBoxCallback() {
 
         @Override
         public void onPresence(final ChatterBoxPresenceMessage pmessage) {
@@ -72,6 +69,8 @@ public class WhoIsOnelineFragment extends ListFragment {
         }
 
     };
+
+
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -117,6 +116,7 @@ public class WhoIsOnelineFragment extends ListFragment {
         super.onAttach(activity);
         Intent chatterBoxServiceIntent = new Intent(getActivity(), ChatterBoxService.class);
         getActivity().bindService(chatterBoxServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
+
 
     }
 

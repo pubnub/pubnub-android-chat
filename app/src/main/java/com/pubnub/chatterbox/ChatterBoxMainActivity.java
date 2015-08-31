@@ -10,44 +10,50 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
-import android.widget.Toolbar;
+import android.widget.FrameLayout;
 
+import com.pubnub.chatterbox.domain.Room;
 import com.pubnub.chatterbox.domain.UserProfile;
 import com.pubnub.chatterbox.fragments.ChatterBoxRoomFragment;
 import com.pubnub.chatterbox.fragments.RoomHost;
+import com.pubnub.chatterbox.fragments.WhoIsOnelineFragment;
 import com.pubnub.chatterbox.service.ChatterBoxService;
 import com.pubnub.chatterbox.service.binder.ChatterBoxClient;
 
 import java.util.HashMap;
+import java.util.Map;
 
 
-public class ChatterBoxMainActivity extends Activity implements RoomHost {
+public class ChatterBoxMainActivity extends AppCompatActivity implements RoomHost {
 
-    /**
-     * Fragment managing the behaviors, interactions and presentation of the navigation drawer.
-     */
     private ChatterBoxClient chatterBoxServiceClient;
     private UserProfile currentUserProfile;
     private WhoIsOnelineFragment whoIsOnelineFragment;
     private HashMap<String,Room> currentlyHostedRooms = new HashMap<>();
+
+    private String currentRoomKey;
     private boolean connectedToRoom = false;
 
 
     private DrawerLayout mDrawLayout;
     private Toolbar mToolBar;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private FrameLayout mDrawFragmentLayout;
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(Constants.LOGT, "connecting to service");
             chatterBoxServiceClient = (ChatterBoxClient) service;
-            chatterBoxServiceClient.connect(currentUserProfile);
-            addRoom(Constants.MAIN_CHAT_ROOM, "Main");
         }
 
         @Override
@@ -56,27 +62,31 @@ public class ChatterBoxMainActivity extends Activity implements RoomHost {
         }
     };
 
-    //small class to track rooms
-    class Room {
-        public String roomName;
-        public String roomTitle;
-        public boolean isActive;
-    }
 
 
     @Override
     public void connectedToRoom(String roomTitle, String roomChannelForHereNow) {
-        whoIsOnelineFragment = WhoIsOnelineFragment.newInstance(currentUserProfile,roomChannelForHereNow,roomTitle);
-        whoIsOnelineFragment.setCurrentUserProfile(currentUserProfile);
+
+
+
+
         connectedToRoom = true;
 
-        //could use this for history
         Room r = new Room();
-        r.roomName = roomChannelForHereNow;
-        r.roomTitle = roomTitle;
-        r.isActive = true;
+        r.setRoomName(roomChannelForHereNow);
+        r.setRoomTitle(roomTitle);
+        r.setActive(true);
+
         currentlyHostedRooms.put(roomChannelForHereNow, r);
 
+        whoIsOnelineFragment = WhoIsOnelineFragment.newInstance(currentUserProfile,roomChannelForHereNow,roomTitle);
+        whoIsOnelineFragment.setCurrentUserProfile(currentUserProfile);
+        FragmentManager fm = getFragmentManager();
+        FragmentTransaction fragmentTransaction = fm.beginTransaction();
+        fragmentTransaction.replace(R.id.whos_online_fragment_container, whoIsOnelineFragment);
+        fragmentTransaction.commit();
+
+        getSupportActionBar().setTitle(r.getRoomTitle());
     }
 
     @Override
@@ -86,92 +96,92 @@ public class ChatterBoxMainActivity extends Activity implements RoomHost {
         currentlyHostedRooms.remove(roomChannelName);
     }
 
-
-
-    private DrawerLayout.DrawerListener mDrawListener = new DrawerLayout.DrawerListener() {
-        @Override
-        public void onDrawerSlide(View drawerView, float slideOffset) {
-
-        }
-
-        @Override
-        public void onDrawerOpened(View drawerView) {
-            //upodate the title
-        }
-
-        @Override
-        public void onDrawerClosed(View drawerView) {
-
-        }
-
-        @Override
-        public void onDrawerStateChanged(int newState) {
-
-        }
-    };
+    @Override
+    public Map<String, Room> getCurrentRooms() {
+        return currentlyHostedRooms;
+    }
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        requestWindowFeature(Window.FEATURE_ACTION_BAR);
-
         setContentView(R.layout.activity_pubnub_main);
 
+        if (null == currentUserProfile) {
+            startActivityForResult(new Intent(this, ChatterBoxLogin.class), Constants.SIGN_IN_REQUEST, null);
+        }
+
         mDrawLayout = (DrawerLayout)findViewById(R.id.mainDrawerLayout);
-        mDrawLayout.setDrawerListener(mDrawListener);
-
         mToolBar = (Toolbar)findViewById(R.id.application_toolbar);
-        mToolBar.inflateMenu(R.menu.chatterbox_main);
+        mDrawFragmentLayout = (FrameLayout)findViewById(R.id.whos_online_fragment_container);
 
-        mToolBar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+        mDrawerToggle = new ActionBarDrawerToggle(this,mDrawLayout,mToolBar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close){
+
             @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                Log.d(Constants.LOGT, item.toString());
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                invalidateOptionsMenu();
+            }
 
-                if((connectedToRoom) && (item.getTitle().equals(getString(R.string.whos_on)))){
-                        if(mDrawLayout.isDrawerOpen(Gravity.LEFT)){
-                            mDrawLayout.closeDrawer(Gravity.LEFT);
-                        }else{
-                            mDrawLayout.openDrawer(Gravity.LEFT);
-                        }
-                }
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+                invalidateOptionsMenu();
+            }
+        };
 
-                return true;
+        mDrawLayout.setDrawerListener(mDrawerToggle);
+
+
+        setSupportActionBar(mToolBar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
+        mDrawLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                mDrawerToggle.syncState();
             }
         });
 
-        mToolBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(mDrawLayout.isDrawerOpen(Gravity.LEFT)){
-                    mDrawLayout.closeDrawer(Gravity.LEFT);
-                }else{
-                    mDrawLayout.openDrawer(Gravity.LEFT);
-                }
-        }});
+
+    }
 
 
-        //TODO: clean this up and use the login activity
-        if (null == currentUserProfile) {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.chatterbox_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
 
-            currentUserProfile = new UserProfile();
-            currentUserProfile.setEmail("fred@pubnub.com");
-            currentUserProfile.setFirstName("Frederick");
-            currentUserProfile.setLastName("Brock");
-            currentUserProfile.setLocation("Vancouver");
-            currentUserProfile.setId("333333333");
-
-            //startActivityForResult(new Intent(this, ChatterBoxLogin.class), Constants.SIGN_IN_REQUEST, null);
-        }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
 
 
-         //GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
-         //String registrationID = gcm.register(Constants.PROJECT_ID);
+        switch(item.getItemId()){
+            case R.id.action_view_history:
+                Log.d(Constants.LOGT, "view history appbar option selected");
+                break;
+            case 16908332:
+                Log.d(Constants.LOGT, "navigation indicator clicked, this seems to be the only way to capture this");
+                //mDrawLayout.openDrawer(mDrawFragmentLayout); //This seems to work just fine for the drawer
+                mDrawLayout.openDrawer(Gravity.LEFT);
+                break;
+            case R.id.action_whosonline:
+                mDrawLayout.openDrawer(Gravity.LEFT);
+                break;
+            case R.id.action_leave_room:
+                chatterBoxServiceClient.leaveRoom(currentRoomKey);
+                break;
+            default:
+                Log.d(Constants.LOGT, "option was selected with id: " + item.getItemId() + " name: " + item.getTitle());
+            }
 
+
+        return super.onOptionsItemSelected(item);
     }
 
 
@@ -182,15 +192,11 @@ public class ChatterBoxMainActivity extends Activity implements RoomHost {
             bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
-
-
-
     @Override
     protected void onActivityResult(int requestCode, int responseCode, Intent intent) {
         if (requestCode == Constants.SIGN_IN_REQUEST) {
             if (responseCode == Activity.RESULT_OK) {
-                currentUserProfile =
-                   (UserProfile) intent.getExtras().getSerializable(Constants.CURRENT_USER_PROFILE);
+                currentUserProfile = (UserProfile) intent.getExtras().getSerializable(Constants.CURRENT_USER_PROFILE);
                 chatterBoxServiceClient.connect(currentUserProfile);
                 addRoom(Constants.MAIN_CHAT_ROOM, "Main");
             }
@@ -204,7 +210,13 @@ public class ChatterBoxMainActivity extends Activity implements RoomHost {
         ChatterBoxRoomFragment roomFragment = ChatterBoxRoomFragment.newInstance(currentUserProfile, roomName, roomTitle);
         fragmentTransaction.replace(R.id.room_fragment_container, roomFragment);
         fragmentTransaction.commit();
+
+
+
     }
+
+
+
 
 
 

@@ -21,7 +21,7 @@ import com.pubnub.chatterbox.domain.ChatterBoxPresenceMessage;
 import com.pubnub.chatterbox.domain.ChatterBoxPrivateChatRequest;
 import com.pubnub.chatterbox.domain.UserProfile;
 import com.pubnub.chatterbox.service.ChatterBoxService;
-import com.pubnub.chatterbox.service.DefaultLChatterBoxCallback;
+import com.pubnub.chatterbox.service.DefaultChatterBoxCallback;
 import com.pubnub.chatterbox.service.binder.ChatterBoxClient;
 
 
@@ -37,7 +37,7 @@ public class ChatterBoxRoomFragment extends Fragment {
     private String roomChannel;
 
 
-    private DefaultLChatterBoxCallback roomListener = new DefaultLChatterBoxCallback(){
+    private DefaultChatterBoxCallback roomListener = new DefaultChatterBoxCallback(){
         @Override
         public void onPresence(ChatterBoxPresenceMessage pmessage) {
 
@@ -80,6 +80,7 @@ public class ChatterBoxRoomFragment extends Fragment {
                 chatterBoxServiceClient.connect(currentUserProfile);
             }
             chatterBoxServiceClient.addRoom(roomChannel,roomListener);
+            mListener.connectedToRoom(roomTitle,roomChannel);
         }
 
         @Override
@@ -176,6 +177,7 @@ public class ChatterBoxRoomFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         chatterBoxServiceClient.removeRoomListener(roomChannel, roomListener);
+        mListener.disconnectingFromRoom(roomChannel);
         mListener = null;
 
     }

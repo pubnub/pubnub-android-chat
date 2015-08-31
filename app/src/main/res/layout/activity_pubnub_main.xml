@@ -1,54 +1,51 @@
-
-<android.support.v4.widget.DrawerLayout
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_centerVertical="true"
-    android:id="@+id/mainDrawerLayout"
-    android:elevation="7dp"
-    xmlns:android="http://schemas.android.com/apk/res/android"
->
+    android:id="@+id/main_layout">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
+
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/mainDrawerLayout"
+        android:layout_centerVertical="true"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
-
-        <include layout="@layout/application_toolbar" />
+        android:layout_width="match_parent">
 
 
-
-        <FrameLayout
-            android:layout_width="match_parent"
+        <RelativeLayout
+            android:fitsSystemWindows="true"
             android:layout_height="match_parent"
-            android:layout_marginLeft="2dp"
-            android:layout_marginRight="2dp"
-            android:layout_marginTop="2dp"
-            android:layout_marginBottom="2dp"
-            android:id="@+id/room_fragment_container"/>
-
-    </RelativeLayout>
-
-
-    <LinearLayout
-        android:id="@+id/whos_online_drawer"
-        android:layout_width="240dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:choiceMode="singleChoice"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0dp"
-        android:background="#111">
-
-
-        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="30dp"
-            android:id="@+id/whos_online_fragment_container"/>
+            android:id="@+id/main_content">
 
-    </LinearLayout>
+            <include
+                layout="@layout/application_toolbar"
+                android:id="@+id/application_toolbar" />
 
-   </android.support.v4.widget.DrawerLayout>
 
+            <FrameLayout
+                android:id="@+id/room_fragment_container"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="2dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginTop="1dp"
+                android:paddingTop="?attr/actionBarSize"
+                android:layout_width="match_parent">
+            </FrameLayout>
 
+        </RelativeLayout>
+
+         <FrameLayout
+             android:id="@+id/whos_online_fragment_container"
+             android:layout_height="match_parent"
+             android:layout_width="280dp"
+             android:layout_gravity="start"
+             android:background="#FFFFFF"/>
+
+    </android.support.v4.widget.DrawerLayout>
+
+</LinearLayout>
 
 

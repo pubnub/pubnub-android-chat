@@ -16,7 +16,6 @@ import com.pubnub.chatterbox.domain.ChatterBoxPrivateChatRequest;
  */
 public interface ChatterBoxCallback {
 
-
     void onMessage(ChatterBoxMessage message);
 
     void onMessagePublished(String message);

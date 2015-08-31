@@ -32,31 +32,33 @@ public class PresenceCallback extends Callback {
     }
 
 
+
+
     @Override
     public void successCallback(String channel, Object message) {
-
-    }
-
-    @Override
-    public void successCallback(String channel, Object message, String timetoken) {
         Log.d(Constants.LOGT, "successCallback for presence");
-
         try {
             ChatterBoxPresenceMessage presenceMessage = new ChatterBoxPresenceMessage();
             if (message instanceof JSONObject) {
                 final JSONObject messageJSON = (JSONObject) message;
-                Log.d(Constants.LOGT, messageJSON.toString(2));
+                if(!messageJSON.has("action")){
+                    Log.d(Constants.LOGT, "The presence payload has no value because its a status message");
+                    return;
+                }
+                Log.d(Constants.LOGT, messageJSON.toString());
 
                 String action = messageJSON.getString("action");
                 String uuid = messageJSON.getString("uuid");
+                String timeStamp = messageJSON.getString("timestamp");
+                Integer occupancyCount = messageJSON.getInt("occupancy");
+
                 UserProfile targetProfile = null;
                 presenceMessage.setActionType(action);
-                presenceMessage.setTimeToken(timetoken);
-
+                presenceMessage.setTimeToken(timeStamp);
+                presenceMessage.setOccupancyCount(occupancyCount);
+                presenceMessage.setUuid(uuid);
 
                 if (action.equals("join")) {
-                    //Call pubnub and ask for the state of the user. This will give you the profile
-                    //in this caase, but can be used for other purposes as well.
 
                     targetProfile = new UserProfile();
                     targetProfile.setId(messageJSON.getString("uuid"));
@@ -73,7 +75,6 @@ public class PresenceCallback extends Callback {
                     //assuming you already have a profile for this user
                     targetProfile = globalPresenceList.get(uuid);
                     JSONObject stateData = messageJSON.getJSONObject("data");
-                    //Data will contain the user profile fields.
                     String userName = stateData.getString("userName");
                     String firstName = stateData.getString("firstName");
                     String lastName = stateData.getString("lastName");
@@ -87,10 +88,7 @@ public class PresenceCallback extends Callback {
                     targetProfile.setFirstName(firstName);
                     targetProfile.setEmail(email);
                     targetProfile.setLocation(location);
-
-
                     globalPresenceList.put(uuid, targetProfile);
-
 
                 } else if (action.equals("leave") || action.equals("timeout")) {
                     targetProfile = globalPresenceList.remove(uuid);

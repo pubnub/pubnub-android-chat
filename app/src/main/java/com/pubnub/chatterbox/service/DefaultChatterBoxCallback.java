@@ -7,7 +7,9 @@ import com.pubnub.chatterbox.domain.ChatterBoxPrivateChatRequest;
 /**
  * Created by Frederick on 5/14/15.
  */
-public class DefaultLChatterBoxCallback implements ChatterBoxCallback {
+
+public class DefaultChatterBoxCallback implements ChatterBoxCallback {
+
     @Override
     public void onMessage(ChatterBoxMessage message) {
 

@@ -6,9 +6,6 @@ import org.json.JSONObject;
 
 import java.util.Date;
 
-/**
- * Created by Frederick on 4/6/15.
- */
 public class ChatterBoxMessage {
 
     public static final String DEVICETAG = "deviceTag";
@@ -22,6 +19,8 @@ public class ChatterBoxMessage {
 
     //Message types
     public static final String MTYPE_PRIVATE_CHAT_REQUEST = "pcr";
+    public static final String CHATTMESSAGE = "chattmessage";
+
     private String type;
     private String messageContent;
     private String from;
@@ -31,6 +30,7 @@ public class ChatterBoxMessage {
     private Drawable avatarImage;
     private String senderUUID;
 
+
     private ChatterBoxMessage() {
 
     }
@@ -38,7 +38,7 @@ public class ChatterBoxMessage {
     public static ChatterBoxMessage create() {
 
         ChatterBoxMessage c = new ChatterBoxMessage();
-        c.setType("chatmessage");
+        c.setType(CHATTMESSAGE);
         return c;
     }
 
@@ -57,12 +57,6 @@ public class ChatterBoxMessage {
         //TODO convert the timeToken? or add the date to the content?
         message.setSentOn(new Date());
         message.setSenderUUID(uuid);
-
-        //Long timeToken = Long.parseLong(timeToken);
-        //Calendar c = Calendar.getInstance();
-        //c.setTimeInMillis(timeToken / 10000);
-
-
         message.setEmoticon(emoticon);
         message.setMessageContent(messageContent);
 

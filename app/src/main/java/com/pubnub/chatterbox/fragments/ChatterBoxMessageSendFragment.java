@@ -20,7 +20,7 @@ import com.pubnub.chatterbox.R;
 import com.pubnub.chatterbox.domain.ChatterBoxMessage;
 import com.pubnub.chatterbox.domain.UserProfile;
 import com.pubnub.chatterbox.service.ChatterBoxService;
-import com.pubnub.chatterbox.service.DefaultLChatterBoxCallback;
+import com.pubnub.chatterbox.service.DefaultChatterBoxCallback;
 import com.pubnub.chatterbox.service.binder.ChatterBoxClient;
 
 import java.util.Date;
@@ -35,8 +35,7 @@ public class ChatterBoxMessageSendFragment extends Fragment {
     private ImageButton mBtnSend;
     private String roomName;
 
-
-    private DefaultLChatterBoxCallback roomListener = new DefaultLChatterBoxCallback() {
+    private DefaultChatterBoxCallback roomListener = new DefaultChatterBoxCallback() {
         @Override
         public void onMessagePublished(String timeToken) {
             Log.d(Constants.LOGT, "inside: onMessagePublished for Send fragment");
@@ -120,16 +119,16 @@ public class ChatterBoxMessageSendFragment extends Fragment {
                 }
 
                 ChatterBoxMessage message = ChatterBoxMessage.create();
-                message.setFrom(currentUserProfile.getUserName());
                 message.setDeviceTag("android");
                 message.setSenderUUID(currentUserProfile.getId());
-                message.setType("chattmessage");
+                message.setType(ChatterBoxMessage.CHATTMESSAGE);
                 message.setMessageContent(txtMsg.getText().toString());
                 message.setFrom(currentUserProfile.getEmail());
                 message.setSentOn(new Date());
 
                 txtMsg.setEnabled(false);
                 btn.setEnabled(false);
+
                 if (chatterBoxServiceClient.isConnected()) {
                     chatterBoxServiceClient.publish(roomNameF, message);
                     txtMsg.setText("");

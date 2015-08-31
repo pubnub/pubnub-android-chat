@@ -162,7 +162,6 @@ public class ChatterBoxLogin extends PlusBaseActivity implements LoaderCallbacks
             userProfile.setFirstName(firstName);
             userProfile.setLastName(lastName);
 
-            finish();
             showProgress(false);
 
 
