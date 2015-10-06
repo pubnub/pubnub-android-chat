@@ -29,14 +29,13 @@ public class ChatterBoxClient extends Binder {
 
     private ChatterBoxService chatterBoxService;
 
-    ChatterBoxClient getService() {
-        return ChatterBoxClient.this;
-    }
-
     public ChatterBoxClient(ChatterBoxService service) {
         chatterBoxService = service;
     }
 
+    ChatterBoxClient getService() {
+        return ChatterBoxClient.this;
+    }
 
     public void publish(final String channel, ChatterBoxMessage message) {
         try {
@@ -45,37 +44,37 @@ public class ChatterBoxClient extends Binder {
             messageJSON.put(ChatterBoxMessage.SENDERUUID, chatterBoxService.getPubNub().getUUID()); //Set the uuid
             messageJSON.put(ChatterBoxMessage.EMOTICON, "");
             messageJSON.put(ChatterBoxMessage.FROM, message.getFrom());
-            messageJSON.put(ChatterBoxMessage.SENTON, new Date());
+            messageJSON.put(ChatterBoxMessage.SENTON, new Date().getTime());
             messageJSON.put(ChatterBoxMessage.TYPE, message.getType());
             messageJSON.put(ChatterBoxMessage.MESSAGECONTENT, message.getMessageContent());
             messageJSON.put(ChatterBoxMessage.SENDERUUID, chatterBoxService.getCurrentUserProfile().getEmail());
 
 
-            chatterBoxService.getPubNub().publish(channel,messageJSON, true, new Callback(){
+            chatterBoxService.getPubNub().publish(channel, messageJSON, true, new Callback() {
                 @Override
                 public void successCallback(String channel, Object message) {
                     List<ChatterBoxCallback> listeners = chatterBoxService.getListeners().get(channel);
                     //String status = "";
                     String timeToken = "";
                     //String resultCode = "";
-                    try{
-                        JSONArray results = (JSONArray)message;
+                    try {
+                        JSONArray results = (JSONArray) message;
                         timeToken = results.getString(2);
-                    }catch (JSONException e){
+                    } catch (JSONException e) {
                         Log.d(Constants.LOGT, "Exception while attempting to process publish results.");
                     }
 
                     //Give the timeToken back to all listeners on that channel
                     //make sure the callback runs on the UI thread!!!
-                    for(ChatterBoxCallback chatterBoxCallback: listeners){
+                    for (ChatterBoxCallback chatterBoxCallback : listeners) {
                         chatterBoxCallback.onMessagePublished(timeToken);
                     }
                 }
 
                 @Override
-                public void errorCallback(String channel, PubnubError error){
+                public void errorCallback(String channel, PubnubError error) {
                     List<ChatterBoxCallback> listeners = chatterBoxService.getListeners().get(channel);
-                    for(ChatterBoxCallback chatterBoxCallback: listeners){
+                    for (ChatterBoxCallback chatterBoxCallback : listeners) {
                         chatterBoxCallback.onError(error.getErrorString());
                     }
                 }
@@ -88,44 +87,43 @@ public class ChatterBoxClient extends Binder {
     }
 
 
-
-    public void history(String channel, long start, long end) {
+    public List<ChatterBoxMessage> history(String channel, long start, long end, int numberOfMessages) {
 
 
         //long fiveMinAgo = (new Date().getTime() - (5 * 60 * 1000)) * 100000;
+        final List<ChatterBoxMessage> historyMessages = new ArrayList<>();
 
         //Starting Five minutes ago
-        chatterBoxService.getPubNub().history(channel,
-                start,
-                end,
-                100,
-                true, false,
-                new Callback(){
+        chatterBoxService.getPubNub().history(channel, start, end, numberOfMessages, true, false,
+                new Callback() {
 
-            @Override
-            public void successCallback(String channel, Object message) {
-                try {
-                    Log.d(Constants.LOGT, "successful history call");
-                    JSONArray jarr = (JSONArray) message;
+                    @Override
+                    public void successCallback(String channel, Object message) {
+                        try {
+                            Log.d(Constants.LOGT, "successful history call");
+                            JSONArray jarr = (JSONArray) message;
 
-                    JSONArray messages = (JSONArray)jarr.get(0);
-                    String oldestTimeStamp = jarr.getString(1);
-                    String newestTimeStamp = jarr.getString(2);
+                            JSONArray messages = (JSONArray) jarr.get(0);
+                            String oldestTimeStamp = jarr.getString(1);
+                            String newestTimeStamp = jarr.getString(2);
 
-                    for(int idx=0; idx< messages.length(); ++idx){
-                        JSONObject m = (JSONObject)messages.get(idx);
-                        ChatterBoxMessage chatterBoxMessage = ChatterBoxMessage.create(m,m.getString("timeToken"));
+                            for (int idx = 0; idx < messages.length(); ++idx) {
+                                JSONObject m = (JSONObject) messages.get(idx);
+                                ChatterBoxMessage chatterBoxMessage = ChatterBoxMessage.create(m, m.getString("timeToken"));
+                                historyMessages.add(chatterBoxMessage);
+                            }
+                        } catch (Exception e) {
+                            Log.e(Constants.LOGT, "Exception processing history", e);
+                        }
                     }
-                } catch (Exception e) {
-                    Log.e(Constants.LOGT, "Exception processing history", e);
-                }
-            }
 
-            @Override
-            public void errorCallback(String message, PubnubError error) {
-                //Process error
-            }
-        });
+                    @Override
+                    public void errorCallback(String message, PubnubError error) {
+                        //Process error
+                    }
+                });
+
+        return historyMessages;
     }
 
 
@@ -164,10 +162,18 @@ public class ChatterBoxClient extends Binder {
                                             l.onMessage(msg);
                                         }
                                     }
+
+
                                 }
                             } catch (Exception e) {
                                 Log.e(Constants.LOGT, "Exception while processing message", e);
                             }
+                        }
+
+                        @Override
+                        public void connectCallback(String channel, Object message) {
+
+                            //history(channel, );
                         }
 
                         @Override
@@ -188,7 +194,17 @@ public class ChatterBoxClient extends Binder {
                     chatterBoxService.getListeners().put(roomName, l);
 
                     //Set up the Presence on this Room
-                    chatterBoxService.getPubNub().presence(roomName, new PresenceCallback(l, chatterBoxService.getPubNub(), chatterBoxService.getGlobalPresenceCache()));
+                    chatterBoxService.getPubNub().presence(roomName, new PresenceCallback(l, chatterBoxService.getPubNub(), chatterBoxService.getPresenceCache()));
+
+
+                    //Grab the last 10 messages
+                    List<ChatterBoxMessage> historyMessages = history(roomName, -1, -1, 50);
+
+                    for (ChatterBoxMessage m : historyMessages) {
+                        for (ChatterBoxCallback c : l) {
+                            c.onMessage(m);
+                        }
+                    }
 
 
                 } catch (Exception e) {
@@ -212,18 +228,21 @@ public class ChatterBoxClient extends Binder {
     }
 
 
-    public void removeRoomListener(String roomName, ChatterBoxCallback listener){
-        Map<String,List<ChatterBoxCallback>> rooms = chatterBoxService.getListeners();
+    public void removeRoomListener(String roomName, ChatterBoxCallback listener) {
+        Map<String, List<ChatterBoxCallback>> rooms = chatterBoxService.getListeners();
         List<ChatterBoxCallback> roomListeners = rooms.get(roomName);
         roomListeners.remove(listener);
     }
 
 
     public void leaveRoom(String roomName) {
-        Map<String,List<ChatterBoxCallback>> rooms = chatterBoxService.getListeners();
-        List<ChatterBoxCallback> roomListeners = rooms.get(roomName);
-        roomListeners.clear();
-        chatterBoxService.getPubNub().unsubscribe(roomName);
+
+        Map<String, List<ChatterBoxCallback>> rooms = chatterBoxService.getListeners();
+        if (rooms.containsKey(roomName)) {
+            List<ChatterBoxCallback> roomListeners = rooms.get(roomName);
+            roomListeners.clear();
+            chatterBoxService.getPubNub().unsubscribe(roomName);
+        }
     }
 
 
@@ -234,7 +253,7 @@ public class ChatterBoxClient extends Binder {
 
     public boolean connect(UserProfile userProfile) {
 
-        if(userProfile != null) {
+        if (userProfile != null) {
             chatterBoxService.setCurrentUserProfile(userProfile);
         }
 
@@ -255,7 +274,7 @@ public class ChatterBoxClient extends Binder {
         listeners.add(presenceListener);
 
         HashMap<String, UserProfile> presenceCache =
-                chatterBoxService.getGlobalPresenceCache();
+                chatterBoxService.getPresenceCache();
 
         Pubnub pubnub = chatterBoxService.getPubNub();
 
@@ -268,13 +287,8 @@ public class ChatterBoxClient extends Binder {
     }
 
 
-    /*public boolean disconnect(UserProfile userProfile, boolean enablePush) {
-        String[] channels = chatterBoxService.getPubNub().getSubscribedChannelsArray();
-    }*/
-
-
     public HashMap<String, UserProfile> getGlobalPresenceList() {
-        return (chatterBoxService.getGlobalPresenceCache());
+        return (chatterBoxService.getPresenceCache());
     }
 
 }

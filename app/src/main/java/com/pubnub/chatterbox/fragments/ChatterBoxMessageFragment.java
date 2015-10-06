@@ -121,7 +121,8 @@ public class ChatterBoxMessageFragment extends Fragment implements AbsListView.O
         // TODO: Change Adapter to display your content
         mAdapter = new ChatMessageListArrayAdapter(getActivity()
                 , R.layout.chat_message_item,
-                chatterMessageArray);
+                chatterMessageArray,
+                currentUserProfile);
 
 
     }

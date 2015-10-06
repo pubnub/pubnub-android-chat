@@ -116,9 +116,8 @@ public class WhoIsOnelineFragment extends ListFragment {
         super.onAttach(activity);
         Intent chatterBoxServiceIntent = new Intent(getActivity(), ChatterBoxService.class);
         getActivity().bindService(chatterBoxServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
-
-
     }
+
 
     @Override
     public void onDetach() {

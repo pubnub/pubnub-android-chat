@@ -16,7 +16,14 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+
+        debug {
+            buildConfigField "String", "SUBSCRIBE_KEY",  "\"sub-c-91f79b16-6c26-11e5-bcab-02ee2ddab7fe\""
+            buildConfigField "String", "PUBLISH_KEY",  "\"pub-c-970872ae-ddda-4daf-a20c-7229db4039ba\""
+            buildConfigField "String", "GCM_PROJECT_ID",  "\"347849282940\""
+        }
     }
+
     productFlavors {
     }
 }

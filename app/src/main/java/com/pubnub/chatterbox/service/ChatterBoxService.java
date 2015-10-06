@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;
+import com.pubnub.chatterbox.BuildConfig;
 import com.pubnub.chatterbox.Constants;
 import com.pubnub.chatterbox.domain.UserProfile;
 import com.pubnub.chatterbox.service.binder.ChatterBoxClient;
@@ -17,14 +18,8 @@ import java.util.Map;
 
 public class ChatterBoxService extends Service {
 
-    //put these in shared prefs
-    private static final String subscribe_key = "sub-c-8bd55596-1f48-11e5-9205-0619f8945a4f";
-    private static final String publish_key = "pub-c-27c05fcb-d215-4433-9b95-a6e3fd9f49d7";
-    /**
-     * some internal state to manage the service interaction with the UI,
-     */
     private final Map<String, List<ChatterBoxCallback>> listeners = new HashMap<>();
-    private final HashMap<String, UserProfile> globalPresenceCache = new HashMap<>();
+    private final HashMap<String, UserProfile> presenceCache = new HashMap<>();
 
 
     /**
@@ -47,8 +42,8 @@ public class ChatterBoxService extends Service {
         return listeners;
     }
 
-    public HashMap<String, UserProfile> getGlobalPresenceCache() {
-        return globalPresenceCache;
+    public HashMap<String, UserProfile> getPresenceCache() {
+        return presenceCache;
     }
 
     public UserProfile getCurrentUserProfile() {
@@ -65,7 +60,6 @@ public class ChatterBoxService extends Service {
     }
 
 
-
     public String getGcmregistrationID() {
         return gcmregistrationID;
     }
@@ -77,11 +71,11 @@ public class ChatterBoxService extends Service {
     public Pubnub getPubNub() {
         if ((null == pubnub) && (currentUserProfile != null)) {
 
-            pubnub = new Pubnub(publish_key,
-                                subscribe_key,
-                                false);
+            pubnub = new Pubnub(BuildConfig.PUBLISH_KEY,
+                    BuildConfig.SUBSCRIBE_KEY,
+                    false);
 
-            pubnub.setHeartbeat(80, new Callback() {
+            pubnub.setHeartbeat(140, new Callback() {
                 @Override
                 public void successCallback(String channel, Object message) {
                     Log.d(Constants.LOGT, "heartbeat received");
@@ -94,9 +88,12 @@ public class ChatterBoxService extends Service {
                 }
             });
 
-            pubnub.setHeartbeatInterval(60);
+
+            pubnub.setHeartbeatInterval(120);
+
             pubnub.setNonSubscribeTimeout(60);
             pubnub.setResumeOnReconnect(true);
+            pubnub.setMaxRetries(500);
 
 
             pubnub.setSubscribeTimeout(20000);

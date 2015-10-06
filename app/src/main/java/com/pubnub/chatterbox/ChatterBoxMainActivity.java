@@ -67,9 +67,6 @@ public class ChatterBoxMainActivity extends AppCompatActivity implements RoomHos
     @Override
     public void connectedToRoom(String roomTitle, String roomChannelForHereNow) {
 
-
-
-
         connectedToRoom = true;
 
         Room r = new Room();
@@ -94,6 +91,7 @@ public class ChatterBoxMainActivity extends AppCompatActivity implements RoomHos
         connectedToRoom = false;
         //for now just remove the room
         currentlyHostedRooms.remove(roomChannelName);
+        chatterBoxServiceClient.leaveRoom(roomChannelName);
     }
 
     @Override
