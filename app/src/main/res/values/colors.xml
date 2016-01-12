@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primaryColor">#F44336</color>
+    <color name="primaryColorDark">#D32F2F</color>
+    <color name="accentColor">#FFEB3B</color>
+    <color name="accentColorFab">#c0392b</color>
+    <color name="message_view_background">#FFFFFF</color>
+    <color name="bubble_message_inbound_bg">#c62828</color>
+    <color name="bubble_message_inbound_fg">#FAFAFA</color>
+    <color name="bubble_message_inbound_border">#212121</color>
+
+
+    <color name="bubble_message_outbound_bg">#1E88E5</color>
+    <color name="bubble_message_outbound_fg">#FAFAFA</color>
+    <color name="bubble_message_outbound_border">#212121</color>
+
+</resources>

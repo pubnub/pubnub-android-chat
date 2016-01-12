@@ -1,0 +1,24 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".ChatterBoxMainActivity">
+
+    <item android:id="@+id/action_whosonline"
+        app:showAsAction="always"
+        android:title="@string/whos_on"
+        android:icon="@drawable/ic_whosonline"/>
+
+
+    <item android:id="@+id/action_view_history"
+        app:showAsAction="always"
+        android:title="@string/view_history"
+        android:icon="@drawable/ic_viewhistory"/>
+
+
+    <item android:id="@+id/action_leave_room"
+        app:showAsAction="always"
+        android:title="@string/leave_room"
+        android:icon="@drawable/ic_leaveroom"/>
+
+
+</menu>

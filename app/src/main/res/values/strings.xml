@@ -1,0 +1,42 @@
+<resources>
+    <string name="pubnub_subkey"></string>
+    <string name="pubnub_pubkey"></string>
+
+    <string name="app_name">ChatterBox</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="navigation_drawer_open">Open</string>
+    <string name="navigation_drawer_close">Close</string>
+    <string name="send_message">Send</string>
+
+
+    <string name="title_activity_chatter_box_login">Chatter Box  Simple Chat</string>
+
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password (optional)</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="plus_sign_out">Switch Google+ account</string>
+    <string name="plus_disconnect">Disconnect from Google+</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+
+    <string name="presence_room_title_presence_fragment">Rooms:</string>
+    <string name="presence_online_users">Who is online:</string>
+    <string name="presence_recent_conversations">Recent Conversations:</string>
+    <string name="title_activity_main_menu">MainMenu</string>
+
+    <string name="whos_on">Online</string>
+    <string name="globalroom">Chat</string>
+    <string name="leave_room">Leave</string>
+    <string name="view_history">History</string>
+
+<!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+</resources>

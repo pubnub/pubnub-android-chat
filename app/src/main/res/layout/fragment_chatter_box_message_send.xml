@@ -1,0 +1,34 @@
+
+<LinearLayout
+    android:id="@+id/main_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:padding="2dp">
+
+
+
+    <EditText android:id="@+id/message"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@drawable/sendmessage_background"
+              android:layout_weight=".90"/>
+
+
+
+    <ImageButton
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:id="@+id/send_a_message"
+            android:background="@drawable/ic_send_mr"
+            android:alpha="1"
+            android:layout_alignParentTop="true"
+            android:layout_toEndOf="@+id/message"
+            android:clickable="true"
+            android:elevation="5dp"
+            android:enabled="true"
+            android:layout_weight=".10"/>
+
+</LinearLayout>
+

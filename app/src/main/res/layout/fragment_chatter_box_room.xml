@@ -1,0 +1,39 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.pubnub.chatterbox.fragments.ChatterBoxRoomFragment">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight=".85">
+
+     <FrameLayout
+            android:id="@+id/message_display_fragment_container"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:layout_alignParentStart="true"
+            android:background="@color/message_view_background"/>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight=".15"
+        android:id="@+id/message_input_layout">
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/message_input_fragment_container"
+            android:layout_below="@id/message_display_fragment_container" />
+    </LinearLayout>
+
+
+
+</LinearLayout>
