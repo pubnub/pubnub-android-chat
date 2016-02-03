@@ -21,7 +21,7 @@ import com.pubnub.chatterbox.domain.ChatterBoxMessage;
 import com.pubnub.chatterbox.domain.UserProfile;
 import com.pubnub.chatterbox.service.ChatterBoxService;
 import com.pubnub.chatterbox.service.DefaultChatterBoxCallback;
-import com.pubnub.chatterbox.service.binder.ChatterBoxClient;
+import com.pubnub.chatterbox.service.binder.ChatterBoxServiceClient;
 
 import java.util.Date;
 
@@ -30,7 +30,7 @@ public class ChatterBoxMessageSendFragment extends Fragment {
 
 
     private UserProfile currentUserProfile;
-    private ChatterBoxClient chatterBoxServiceClient;
+    private ChatterBoxServiceClient chatterBoxServiceClient;
     private EditText mMessageEditText;
     private ImageButton mBtnSend;
     private String roomName;
@@ -60,7 +60,7 @@ public class ChatterBoxMessageSendFragment extends Fragment {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(Constants.LOGT, "connecting to service");
-            chatterBoxServiceClient = (ChatterBoxClient) service;
+            chatterBoxServiceClient = (ChatterBoxServiceClient) service;
             if(chatterBoxServiceClient.isConnected() == false){
                 chatterBoxServiceClient.connect(currentUserProfile);
             }

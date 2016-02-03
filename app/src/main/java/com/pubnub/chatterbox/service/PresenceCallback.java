@@ -24,15 +24,12 @@ public class PresenceCallback extends Callback {
     private HashMap<String, UserProfile> globalPresenceList;
     private Pubnub pubnub;
 
-    //TODO: clean up the PubNub reference passing...don't like it.
+
     public PresenceCallback(List<ChatterBoxCallback> listeners, Pubnub pubnub, HashMap<String, UserProfile> globalPresenceList) {
         this.cblist = listeners;
         this.globalPresenceList = globalPresenceList;
         this.pubnub = pubnub;
     }
-
-
-
 
     @Override
     public void successCallback(String channel, Object message) {
@@ -40,11 +37,14 @@ public class PresenceCallback extends Callback {
         try {
             ChatterBoxPresenceMessage presenceMessage = new ChatterBoxPresenceMessage();
             if (message instanceof JSONObject) {
+
                 final JSONObject messageJSON = (JSONObject) message;
+
                 if(!messageJSON.has("action")){
                     Log.d(Constants.LOGT, "The presence payload has no value because its a status message");
                     return;
                 }
+
                 Log.d(Constants.LOGT, messageJSON.toString());
 
                 String action = messageJSON.getString("action");

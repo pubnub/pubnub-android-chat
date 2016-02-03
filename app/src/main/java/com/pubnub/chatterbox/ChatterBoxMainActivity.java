@@ -27,7 +27,7 @@ import com.pubnub.chatterbox.fragments.ChatterBoxRoomFragment;
 import com.pubnub.chatterbox.fragments.RoomHost;
 import com.pubnub.chatterbox.fragments.WhoIsOnelineFragment;
 import com.pubnub.chatterbox.service.ChatterBoxService;
-import com.pubnub.chatterbox.service.binder.ChatterBoxClient;
+import com.pubnub.chatterbox.service.binder.ChatterBoxServiceClient;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,13 +35,12 @@ import java.util.Map;
 
 public class ChatterBoxMainActivity extends AppCompatActivity implements RoomHost {
 
-    private ChatterBoxClient chatterBoxServiceClient;
+    private ChatterBoxServiceClient chatterBoxServiceClient;
     private UserProfile currentUserProfile;
     private WhoIsOnelineFragment whoIsOnelineFragment;
     private HashMap<String,Room> currentlyHostedRooms = new HashMap<>();
 
     private String currentRoomKey;
-    private boolean connectedToRoom = false;
 
 
     private DrawerLayout mDrawLayout;
@@ -53,7 +52,7 @@ public class ChatterBoxMainActivity extends AppCompatActivity implements RoomHos
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(Constants.LOGT, "connecting to service");
-            chatterBoxServiceClient = (ChatterBoxClient) service;
+            chatterBoxServiceClient = (ChatterBoxServiceClient) service;
         }
 
         @Override
@@ -66,8 +65,6 @@ public class ChatterBoxMainActivity extends AppCompatActivity implements RoomHos
 
     @Override
     public void connectedToRoom(String roomTitle, String roomChannelForHereNow) {
-
-        connectedToRoom = true;
 
         Room r = new Room();
         r.setRoomName(roomChannelForHereNow);
@@ -88,7 +85,6 @@ public class ChatterBoxMainActivity extends AppCompatActivity implements RoomHos
 
     @Override
     public void disconnectingFromRoom(String roomChannelName) {
-        connectedToRoom = false;
         //for now just remove the room
         currentlyHostedRooms.remove(roomChannelName);
         chatterBoxServiceClient.leaveRoom(roomChannelName);

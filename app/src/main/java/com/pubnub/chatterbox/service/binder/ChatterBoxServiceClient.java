@@ -7,6 +7,7 @@ import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;
 import com.pubnub.api.PubnubError;
 import com.pubnub.api.PubnubException;
+
 import com.pubnub.chatterbox.Constants;
 import com.pubnub.chatterbox.domain.ChatterBoxMessage;
 import com.pubnub.chatterbox.domain.UserProfile;
@@ -25,24 +26,27 @@ import java.util.List;
 import java.util.Map;
 
 
-public class ChatterBoxClient extends Binder {
+public class ChatterBoxServiceClient extends Binder {
 
     private ChatterBoxService chatterBoxService;
 
-    public ChatterBoxClient(ChatterBoxService service) {
+    public ChatterBoxServiceClient(ChatterBoxService service) {
         chatterBoxService = service;
     }
 
-    ChatterBoxClient getService() {
-        return ChatterBoxClient.this;
+    ChatterBoxServiceClient getService() {
+        return ChatterBoxServiceClient.this;
     }
 
     public void publish(final String channel, ChatterBoxMessage message) {
         try {
+
             JSONObject messageJSON = new JSONObject();
+
             messageJSON.put(ChatterBoxMessage.DEVICETAG, message.getDeviceTag());
             messageJSON.put(ChatterBoxMessage.SENDERUUID, chatterBoxService.getPubNub().getUUID()); //Set the uuid
             messageJSON.put(ChatterBoxMessage.EMOTICON, "");
+
             messageJSON.put(ChatterBoxMessage.FROM, message.getFrom());
             messageJSON.put(ChatterBoxMessage.SENTON, new Date().getTime());
             messageJSON.put(ChatterBoxMessage.TYPE, message.getType());
@@ -51,6 +55,7 @@ public class ChatterBoxClient extends Binder {
 
 
             chatterBoxService.getPubNub().publish(channel, messageJSON, true, new Callback() {
+
                 @Override
                 public void successCallback(String channel, Object message) {
                     List<ChatterBoxCallback> listeners = chatterBoxService.getListeners().get(channel);
@@ -60,6 +65,7 @@ public class ChatterBoxClient extends Binder {
                     try {
                         JSONArray results = (JSONArray) message;
                         timeToken = results.getString(2);
+
                     } catch (JSONException e) {
                         Log.d(Constants.LOGT, "Exception while attempting to process publish results.");
                     }
@@ -91,6 +97,8 @@ public class ChatterBoxClient extends Binder {
 
 
         //long fiveMinAgo = (new Date().getTime() - (5 * 60 * 1000)) * 100000;
+
+
         final List<ChatterBoxMessage> historyMessages = new ArrayList<>();
 
         //Starting Five minutes ago
@@ -104,6 +112,7 @@ public class ChatterBoxClient extends Binder {
                             JSONArray jarr = (JSONArray) message;
 
                             JSONArray messages = (JSONArray) jarr.get(0);
+
                             String oldestTimeStamp = jarr.getString(1);
                             String newestTimeStamp = jarr.getString(2);
 
@@ -112,6 +121,8 @@ public class ChatterBoxClient extends Binder {
                                 ChatterBoxMessage chatterBoxMessage = ChatterBoxMessage.create(m, m.getString("timeToken"));
                                 historyMessages.add(chatterBoxMessage);
                             }
+
+
                         } catch (Exception e) {
                             Log.e(Constants.LOGT, "Exception processing history", e);
                         }
@@ -126,7 +137,7 @@ public class ChatterBoxClient extends Binder {
         return historyMessages;
     }
 
-
+                        //AWG-Global
     public void addRoom(final String roomName, final ChatterBoxCallback listener) {
 
         if (chatterBoxService.isConnected()) {
@@ -143,7 +154,7 @@ public class ChatterBoxClient extends Binder {
                 try {
                     //PubNub Specific
 
-                    chatterBoxService.getPubNub().subscribe(roomName, new Callback() {
+                    chatterBoxService.getPubNub().subscribe(new String[] {roomName, "muUUID"}, new Callback() {
                         @Override
 
                         public void successCallback(String channel, Object message, String timetoken) {
@@ -152,7 +163,9 @@ public class ChatterBoxClient extends Binder {
                                 if (message instanceof JSONObject) {
 
                                     JSONObject jmessage = (JSONObject) message;
+
                                     String messageType = jmessage.getString(ChatterBoxMessage.TYPE);
+
                                     if (messageType.equals("chattmessage")) {
                                         ChatterBoxMessage msg = ChatterBoxMessage.create(jmessage, timetoken);
 
@@ -194,6 +207,7 @@ public class ChatterBoxClient extends Binder {
                     chatterBoxService.getListeners().put(roomName, l);
 
                     //Set up the Presence on this Room
+                    //AWG-Global-pnpres
                     chatterBoxService.getPubNub().presence(roomName, new PresenceCallback(l, chatterBoxService.getPubNub(), chatterBoxService.getPresenceCache()));
 
 

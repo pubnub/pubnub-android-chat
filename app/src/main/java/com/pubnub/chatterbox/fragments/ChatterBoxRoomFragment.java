@@ -22,7 +22,7 @@ import com.pubnub.chatterbox.domain.ChatterBoxPrivateChatRequest;
 import com.pubnub.chatterbox.domain.UserProfile;
 import com.pubnub.chatterbox.service.ChatterBoxService;
 import com.pubnub.chatterbox.service.DefaultChatterBoxCallback;
-import com.pubnub.chatterbox.service.binder.ChatterBoxClient;
+import com.pubnub.chatterbox.service.binder.ChatterBoxServiceClient;
 
 
 public class ChatterBoxRoomFragment extends Fragment {
@@ -30,9 +30,11 @@ public class ChatterBoxRoomFragment extends Fragment {
 
     private RoomHost mListener;
     private UserProfile currentUserProfile;
-    private ChatterBoxClient chatterBoxServiceClient;
+
+    private ChatterBoxServiceClient chatterBoxServiceClient;
     private ChatterBoxMessageSendFragment chatterBoxMessageSendFragment;
     private ChatterBoxMessageFragment chatterBoxMessageListFragment;
+
     private String roomTitle;
     private String roomChannel;
 
@@ -75,7 +77,7 @@ public class ChatterBoxRoomFragment extends Fragment {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(Constants.LOGT, "connecting to service");
-            chatterBoxServiceClient = (ChatterBoxClient) service;
+            chatterBoxServiceClient = (ChatterBoxServiceClient) service;
             if(chatterBoxServiceClient.isConnected() == false){
                 chatterBoxServiceClient.connect(currentUserProfile);
             }

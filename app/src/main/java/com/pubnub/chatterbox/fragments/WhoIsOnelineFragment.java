@@ -17,7 +17,7 @@ import com.pubnub.chatterbox.domain.ChatterBoxPresenceMessage;
 import com.pubnub.chatterbox.domain.UserProfile;
 import com.pubnub.chatterbox.service.ChatterBoxService;
 import com.pubnub.chatterbox.service.DefaultChatterBoxCallback;
-import com.pubnub.chatterbox.service.binder.ChatterBoxClient;
+import com.pubnub.chatterbox.service.binder.ChatterBoxServiceClient;
 
 import java.util.ArrayList;
 
@@ -26,7 +26,7 @@ public class WhoIsOnelineFragment extends ListFragment {
 
     private ArrayList<UserProfile> whosOnline = new ArrayList<>();
     private WhoIsOnlineArrayAdapter mWhosOnlineArrayAdapter;
-    private ChatterBoxClient chatterBoxServiceClient;
+    private ChatterBoxServiceClient chatterBoxServiceClient;
     private UserProfile currentUserProfile;
     private String roomChannel;
     private String roomTitle;
@@ -74,7 +74,7 @@ public class WhoIsOnelineFragment extends ListFragment {
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            chatterBoxServiceClient = (ChatterBoxClient) service;
+            chatterBoxServiceClient = (ChatterBoxServiceClient) service;
             if (chatterBoxServiceClient.isConnected()) {
                 chatterBoxServiceClient.presence(roomChannel, presenceListener);
             }

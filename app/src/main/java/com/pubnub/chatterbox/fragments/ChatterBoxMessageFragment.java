@@ -24,7 +24,7 @@ import com.pubnub.chatterbox.domain.ChatterBoxMessage;
 import com.pubnub.chatterbox.domain.UserProfile;
 import com.pubnub.chatterbox.service.ChatterBoxService;
 import com.pubnub.chatterbox.service.DefaultChatterBoxCallback;
-import com.pubnub.chatterbox.service.binder.ChatterBoxClient;
+import com.pubnub.chatterbox.service.binder.ChatterBoxServiceClient;
 
 import java.util.ArrayList;
 
@@ -32,7 +32,7 @@ public class ChatterBoxMessageFragment extends Fragment implements AbsListView.O
 
 
     private ArrayList<ChatterBoxMessage> chatterMessageArray = new ArrayList<>();
-    private ChatterBoxClient chatterBoxServiceClient;
+    private ChatterBoxServiceClient chatterBoxServiceClient;
     private UserProfile currentUserProfile;
 
     private String roomName;
@@ -77,7 +77,7 @@ public class ChatterBoxMessageFragment extends Fragment implements AbsListView.O
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            chatterBoxServiceClient = (ChatterBoxClient) service;
+            chatterBoxServiceClient = (ChatterBoxServiceClient) service;
             if (chatterBoxServiceClient.isConnected() == false) {
                 chatterBoxServiceClient.connect(currentUserProfile);
             }

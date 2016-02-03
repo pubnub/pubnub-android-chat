@@ -22,6 +22,7 @@ public class ChatterBoxMessage {
     public static final String CHATTMESSAGE = "chattmessage";
 
     private String type;
+    private String ID;
     private String messageContent;
     private String from;
     private Date sentOn;
@@ -43,6 +44,7 @@ public class ChatterBoxMessage {
     }
 
     public static ChatterBoxMessage create(JSONObject obj, String timeToken) throws Exception {
+
         ChatterBoxMessage message = new ChatterBoxMessage();
         String deviceTag = obj.getString(DEVICETAG);
         String type = obj.getString(TYPE);

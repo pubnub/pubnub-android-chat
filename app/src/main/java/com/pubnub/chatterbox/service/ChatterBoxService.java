@@ -7,10 +7,11 @@ import android.util.Log;
 
 import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;
+
 import com.pubnub.chatterbox.BuildConfig;
 import com.pubnub.chatterbox.Constants;
 import com.pubnub.chatterbox.domain.UserProfile;
-import com.pubnub.chatterbox.service.binder.ChatterBoxClient;
+import com.pubnub.chatterbox.service.binder.ChatterBoxServiceClient;
 
 import java.util.HashMap;
 import java.util.List;
@@ -69,16 +70,23 @@ public class ChatterBoxService extends Service {
     }
 
     public Pubnub getPubNub() {
+
         if ((null == pubnub) && (currentUserProfile != null)) {
 
             pubnub = new Pubnub(BuildConfig.PUBLISH_KEY,
-                    BuildConfig.SUBSCRIBE_KEY,
-                    false);
+                                BuildConfig.SUBSCRIBE_KEY,
+                                false);
+            pubnub.setUUID(currentUserProfile.getEmail()); //You can set a custom UUID or let the SDK generate one for you
 
+            //1. registration id can change
+            //2. cache your registration ID in preferences
+            //3. remove stale key
+            //4. add new key
             pubnub.setHeartbeat(140, new Callback() {
                 @Override
                 public void successCallback(String channel, Object message) {
                     Log.d(Constants.LOGT, "heartbeat received");
+
                 }
 
                 @Override
@@ -87,17 +95,12 @@ public class ChatterBoxService extends Service {
                     pubnub.disconnectAndResubscribe();
                 }
             });
-
-
             pubnub.setHeartbeatInterval(120);
-
             pubnub.setNonSubscribeTimeout(60);
             pubnub.setResumeOnReconnect(true);
             pubnub.setMaxRetries(500);
-
-
             pubnub.setSubscribeTimeout(20000);
-            pubnub.setUUID(currentUserProfile.getEmail()); //You can set a custom UUID or let the SDK generate one for you
+
             connected = true;
         }
 
@@ -111,7 +114,7 @@ public class ChatterBoxService extends Service {
 
     @Override
     public IBinder onBind(Intent intent) {
-        ChatterBoxClient chatterBoxClient = new ChatterBoxClient(this);
+        ChatterBoxServiceClient chatterBoxClient = new ChatterBoxServiceClient(this);
         return chatterBoxClient;
     }
 
