@@ -21,7 +21,10 @@ import com.pubnub.chatterbox.ChatMessageListArrayAdapter;
 import com.pubnub.chatterbox.Constants;
 import com.pubnub.chatterbox.R;
 import com.pubnub.chatterbox.domain.ChatterBoxMessage;
+import com.pubnub.chatterbox.domain.ChatterBoxPresenceMessage;
+import com.pubnub.chatterbox.domain.ChatterBoxPrivateChatRequest;
 import com.pubnub.chatterbox.domain.UserProfile;
+import com.pubnub.chatterbox.service.ChatterBoxCallback;
 import com.pubnub.chatterbox.service.ChatterBoxService;
 import com.pubnub.chatterbox.service.DefaultChatterBoxCallback;
 import com.pubnub.chatterbox.service.binder.ChatterBoxServiceClient;
@@ -56,6 +59,7 @@ public class ChatterBoxMessageFragment extends Fragment implements AbsListView.O
         public void onMessage(ChatterBoxMessage message) {
             Log.d(Constants.LOGT, "received a message");
             final ChatterBoxMessage fmsg = message;
+
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -80,9 +84,9 @@ public class ChatterBoxMessageFragment extends Fragment implements AbsListView.O
             chatterBoxServiceClient = (ChatterBoxServiceClient) service;
             if (chatterBoxServiceClient.isConnected() == false) {
                 chatterBoxServiceClient.connect(currentUserProfile);
+
             }
 
-            chatterBoxServiceClient.addRoom(roomName, roomListener);
         }
 
         @Override
@@ -145,8 +149,7 @@ public class ChatterBoxMessageFragment extends Fragment implements AbsListView.O
     }
 
     @Override
-    public void onAttach(Activity activity) {
-
+    public void onAttach(Context activity) {
         super.onAttach(activity);
         Intent chatterBoxServiceIntent = new Intent(getActivity(), ChatterBoxService.class);
         getActivity().bindService(chatterBoxServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE);

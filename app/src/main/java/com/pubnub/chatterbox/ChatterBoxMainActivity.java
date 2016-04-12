@@ -9,10 +9,12 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
@@ -25,7 +27,7 @@ import com.pubnub.chatterbox.domain.Room;
 import com.pubnub.chatterbox.domain.UserProfile;
 import com.pubnub.chatterbox.fragments.ChatterBoxRoomFragment;
 import com.pubnub.chatterbox.fragments.RoomHost;
-import com.pubnub.chatterbox.fragments.WhoIsOnelineFragment;
+import com.pubnub.chatterbox.fragments.WhoIsOnlineFragment;
 import com.pubnub.chatterbox.service.ChatterBoxService;
 import com.pubnub.chatterbox.service.binder.ChatterBoxServiceClient;
 
@@ -37,7 +39,7 @@ public class ChatterBoxMainActivity extends AppCompatActivity implements RoomHos
 
     private ChatterBoxServiceClient chatterBoxServiceClient;
     private UserProfile currentUserProfile;
-    private WhoIsOnelineFragment whoIsOnelineFragment;
+    private WhoIsOnlineFragment whoIsOnelineFragment;
     private HashMap<String,Room> currentlyHostedRooms = new HashMap<>();
 
     private String currentRoomKey;
@@ -49,6 +51,7 @@ public class ChatterBoxMainActivity extends AppCompatActivity implements RoomHos
     private FrameLayout mDrawFragmentLayout;
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
+
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Log.d(Constants.LOGT, "connecting to service");
@@ -73,7 +76,7 @@ public class ChatterBoxMainActivity extends AppCompatActivity implements RoomHos
 
         currentlyHostedRooms.put(roomChannelForHereNow, r);
 
-        whoIsOnelineFragment = WhoIsOnelineFragment.newInstance(currentUserProfile,roomChannelForHereNow,roomTitle);
+        whoIsOnelineFragment = WhoIsOnlineFragment.newInstance(currentUserProfile, roomChannelForHereNow, roomTitle);
         whoIsOnelineFragment.setCurrentUserProfile(currentUserProfile);
         FragmentManager fm = getFragmentManager();
         FragmentTransaction fragmentTransaction = fm.beginTransaction();
@@ -101,6 +104,8 @@ public class ChatterBoxMainActivity extends AppCompatActivity implements RoomHos
 
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
+
+
         setContentView(R.layout.activity_pubnub_main);
 
         if (null == currentUserProfile) {
@@ -111,8 +116,7 @@ public class ChatterBoxMainActivity extends AppCompatActivity implements RoomHos
         mToolBar = (Toolbar)findViewById(R.id.application_toolbar);
         mDrawFragmentLayout = (FrameLayout)findViewById(R.id.whos_online_fragment_container);
 
-        mDrawerToggle = new ActionBarDrawerToggle(this,mDrawLayout,mToolBar,
-                R.string.navigation_drawer_open, R.string.navigation_drawer_close){
+        mDrawerToggle = new ActionBarDrawerToggle(this,mDrawLayout,mToolBar, R.string.navigation_drawer_open, R.string.navigation_drawer_close){
 
             @Override
             public void onDrawerOpened(View drawerView) {

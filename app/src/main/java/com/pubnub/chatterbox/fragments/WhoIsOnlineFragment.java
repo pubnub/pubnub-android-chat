@@ -22,7 +22,7 @@ import com.pubnub.chatterbox.service.binder.ChatterBoxServiceClient;
 import java.util.ArrayList;
 
 
-public class WhoIsOnelineFragment extends ListFragment {
+public class WhoIsOnlineFragment extends ListFragment {
 
     private ArrayList<UserProfile> whosOnline = new ArrayList<>();
     private WhoIsOnlineArrayAdapter mWhosOnlineArrayAdapter;
@@ -91,12 +91,12 @@ public class WhoIsOnelineFragment extends ListFragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public WhoIsOnelineFragment() {
+    public WhoIsOnlineFragment() {
     }
 
 
-    public static WhoIsOnelineFragment newInstance(UserProfile userProfile, String roomChannel, String roomTitle) {
-        WhoIsOnelineFragment fragment = new WhoIsOnelineFragment();
+    public static WhoIsOnlineFragment newInstance(UserProfile userProfile, String roomChannel, String roomTitle) {
+        WhoIsOnlineFragment fragment = new WhoIsOnlineFragment();
         fragment.setCurrentUserProfile(userProfile);
         fragment.setRoomChannel(roomChannel);
         fragment.setRoomTitle(roomTitle);

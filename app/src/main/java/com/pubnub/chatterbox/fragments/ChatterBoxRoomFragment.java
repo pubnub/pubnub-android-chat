@@ -159,7 +159,7 @@ public class ChatterBoxRoomFragment extends Fragment {
 
 
     @Override
-    public void onAttach(Activity activity) {
+    public void onAttach(Context activity) {
         super.onAttach(activity);
         try {
             mListener = (RoomHost) activity;

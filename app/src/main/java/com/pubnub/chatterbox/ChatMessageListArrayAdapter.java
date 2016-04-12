@@ -3,6 +3,7 @@ package com.pubnub.chatterbox;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import com.pubnub.chatterbox.domain.ChatterBoxMessage;
 import com.pubnub.chatterbox.domain.UserProfile;
 
+import java.util.Calendar;
 import java.util.List;
 
 
@@ -59,8 +61,10 @@ public class ChatMessageListArrayAdapter extends ArrayAdapter<ChatterBoxMessage>
 
         messageText.setText(message.getMessageContent());
         messageSentBy.setText(message.getFrom());
-        messageSentOn.setText(message.getSentOn().toGMTString());
-
+        Calendar c = Calendar.getInstance();
+        c.setTime(message.getSentOn());
+        String DATEFMT = "HH:MM";
+        messageSentOn.setText(DateFormat.format(DATEFMT,c));
 
         return returnedView;
     }

@@ -9,17 +9,18 @@ import java.util.Date;
 public class ChatterBoxMessage {
 
     public static final String DEVICETAG = "deviceTag";
-    public static final String TYPE = "type";
+
     public static final String FROM = "from";
     public static final String SENTON = "sentOn";
     public static final String EMOTICON = "emoticon";
     public static final String MESSAGECONTENT = "messageContent";
-    public static final String MESSAGEID = "msgId";
-    public static final String SENDERUUID = "uuid"; //the uuid of the sender
 
-    //Message types
-    public static final String MTYPE_PRIVATE_CHAT_REQUEST = "pcr";
-    public static final String CHATTMESSAGE = "chattmessage";
+    public static final String MSGID = "id";
+    public static final String TYPE = "type";
+
+    public static final String MESSAGE_TYPE_CHATTMESSAGE = "chattbmessage";
+    public static final String SENDERUUID = "senderuuid";
+
 
     private String type;
     private String ID;
@@ -39,7 +40,7 @@ public class ChatterBoxMessage {
     public static ChatterBoxMessage create() {
 
         ChatterBoxMessage c = new ChatterBoxMessage();
-        c.setType(CHATTMESSAGE);
+        c.setType(MESSAGE_TYPE_CHATTMESSAGE);
         return c;
     }
 
@@ -51,14 +52,13 @@ public class ChatterBoxMessage {
         String from = obj.getString(FROM);
         String emoticon = obj.getString(EMOTICON);
         String messageContent = obj.getString(MESSAGECONTENT);
-        String uuid = obj.getString(SENDERUUID);
+
 
         message.setDeviceTag(deviceTag);
         message.setType(type);
         message.setFrom(from);
         //TODO convert the timeToken? or add the date to the content?
         message.setSentOn(new Date());
-        message.setSenderUUID(uuid);
         message.setEmoticon(emoticon);
         message.setMessageContent(messageContent);
 

@@ -5,8 +5,12 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
+
 import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;
+import com.pubnub.api.PubnubError;
+
+
 
 import com.pubnub.chatterbox.BuildConfig;
 import com.pubnub.chatterbox.Constants;
@@ -20,8 +24,9 @@ import java.util.Map;
 public class ChatterBoxService extends Service {
 
     private final Map<String, List<ChatterBoxCallback>> listeners = new HashMap<>();
-    private final HashMap<String, UserProfile> presenceCache = new HashMap<>();
 
+
+    private final HashMap<String, UserProfile> presenceCache = new HashMap<>();
 
     /**
      * Single instance of PubNub
@@ -71,37 +76,49 @@ public class ChatterBoxService extends Service {
 
     public Pubnub getPubNub() {
 
+
         if ((null == pubnub) && (currentUserProfile != null)) {
 
             pubnub = new Pubnub(BuildConfig.PUBLISH_KEY,
                                 BuildConfig.SUBSCRIBE_KEY,
                                 false);
+
+
+
             pubnub.setUUID(currentUserProfile.getEmail()); //You can set a custom UUID or let the SDK generate one for you
 
             //1. registration id can change
             //2. cache your registration ID in preferences
             //3. remove stale key
             //4. add new key
+
             pubnub.setHeartbeat(140, new Callback() {
                 @Override
                 public void successCallback(String channel, Object message) {
-                    Log.d(Constants.LOGT, "heartbeat received");
+                    Log.d(Constants.LOGT, "heartbeat succeeded");
 
                 }
 
                 @Override
-                public void errorCallback(String channel, Object message) {
-                    Log.e(Constants.LOGT, "error receiving heartbeat");
+                public void errorCallback(String channel, PubnubError message) {
+                    Log.e(Constants.LOGT, "err[" + message.getErrorString() + "]");
                     pubnub.disconnectAndResubscribe();
                 }
             });
-            pubnub.setHeartbeatInterval(120);
+
+
             pubnub.setNonSubscribeTimeout(60);
+
             pubnub.setResumeOnReconnect(true);
-            pubnub.setMaxRetries(500);
+
+
+            pubnub.setMaxRetries(5);
+            pubnub.setRetryInterval(10);
+
             pubnub.setSubscribeTimeout(20000);
 
             connected = true;
+
         }
 
         return pubnub;

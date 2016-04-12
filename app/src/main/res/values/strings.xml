@@ -1,6 +1,4 @@
 <resources>
-    <string name="pubnub_subkey"></string>
-    <string name="pubnub_pubkey"></string>
 
     <string name="app_name">ChatterBox</string>
 
@@ -35,8 +33,7 @@
     <string name="leave_room">Leave</string>
     <string name="view_history">History</string>
 
-<!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 
 
 </resources>

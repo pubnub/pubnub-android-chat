@@ -5,7 +5,6 @@ package com.pubnub.chatterbox.domain;
  */
 public class ChatterBoxPresenceMessage {
 
-
     private String actionType;
     private String timeToken;
     private int occupancyCount;

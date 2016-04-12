@@ -121,7 +121,7 @@ public class ChatterBoxMessageSendFragment extends Fragment {
                 ChatterBoxMessage message = ChatterBoxMessage.create();
                 message.setDeviceTag("android");
                 message.setSenderUUID(currentUserProfile.getId());
-                message.setType(ChatterBoxMessage.CHATTMESSAGE);
+                message.setType(ChatterBoxMessage.MESSAGE_TYPE_CHATTMESSAGE);
                 message.setMessageContent(txtMsg.getText().toString());
                 message.setFrom(currentUserProfile.getEmail());
                 message.setSentOn(new Date());
@@ -145,8 +145,8 @@ public class ChatterBoxMessageSendFragment extends Fragment {
 
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         Intent chatterBoxServiceIntent = new Intent(getActivity(), ChatterBoxService.class);
         getActivity().bindService(chatterBoxServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
