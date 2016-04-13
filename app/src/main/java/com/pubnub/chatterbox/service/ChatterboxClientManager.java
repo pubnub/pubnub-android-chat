@@ -3,9 +3,6 @@ package com.pubnub.chatterbox.service;
 import com.pubnub.chatterbox.domain.ChatterBoxMessage;
 import com.pubnub.chatterbox.domain.ChatterBoxPresenceMessage;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,31 +23,32 @@ public class ChatterboxClientManager {
         return eventListeners.get(roomName);
     }
 
-    public boolean hasEventListener(String room){
+    public boolean hasEventListener(String room) {
         return getListeners(room).size() >= 1;
     }
 
-    public void removeEventListener(String room, ChatterBoxEventListener evListener){
-
+    public void removeEventListener(String room, ChatterBoxEventListener evListener) {
+            getListeners(room).remove(evListener);
     }
 
     public void addEventListener(String room, ChatterBoxEventListener evlistener) {
+        log.info("adding event listener {0}", evlistener);
         getListeners(room).add(evlistener);
     }
 
     public void dispatchMessageReceived(String room, ChatterBoxMessage m) {
         List<ChatterBoxEventListener> listeners = getListeners(room);
         for (ChatterBoxEventListener ls : listeners) {
-            if(ls == null){
+            if (ls == null) {
                 log.debug("listener was null on foreach loop");
                 continue;
-            }else {
+            } else {
                 ls.messageReceived(m);
             }
         }
     }
 
-    public void dispathMessagePublished(String room, String m){
+    public void dispathMessagePublished(String room, String m) {
         List<ChatterBoxEventListener> listeners = getListeners(room);
         for (ChatterBoxEventListener ls : listeners) {
             ls.messagePublished(m);
@@ -58,7 +56,7 @@ public class ChatterboxClientManager {
     }
 
 
-    public void dispatchPresenceEvent(String room, ChatterBoxPresenceMessage m){
+    public void dispatchPresenceEvent(String room, ChatterBoxPresenceMessage m) {
         List<ChatterBoxEventListener> listeners = getListeners(room);
         for (ChatterBoxEventListener ls : listeners) {
             ls.presenceEventReceived(m);

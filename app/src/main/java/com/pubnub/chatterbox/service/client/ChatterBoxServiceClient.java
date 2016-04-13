@@ -2,11 +2,9 @@ package com.pubnub.chatterbox.service.client;
 
 import android.os.Binder;
 
-
 import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;
 import com.pubnub.api.PubnubException;
-
 import com.pubnub.chatterbox.Constants;
 import com.pubnub.chatterbox.domain.ChatterBoxMessage;
 import com.pubnub.chatterbox.domain.ChatterBoxPresenceMessage;
@@ -14,7 +12,6 @@ import com.pubnub.chatterbox.domain.ChatterBoxUserProfile;
 import com.pubnub.chatterbox.service.ChatterBoxEventListener;
 import com.pubnub.chatterbox.service.ChatterBoxService;
 import com.pubnub.chatterbox.service.ChatterboxClientManager;
-
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -99,7 +96,7 @@ public class ChatterBoxServiceClient extends Binder {
     }
 
     public void history(String channel, long start, long end, int numberOfMessages) {
-        chatterBoxService.getPubNub().history(channel, start, end, numberOfMessages, true, false,historyCallback);
+        chatterBoxService.getPubNub().history(channel, start, end, numberOfMessages, true, false, historyCallback);
     }
 
     public void joinRoom(final String roomName, final ChatterBoxEventListener listener) {
@@ -123,8 +120,8 @@ public class ChatterBoxServiceClient extends Binder {
     }
 
     public boolean connect(ChatterBoxUserProfile userProfile) {
-            chatterBoxService.setCurrentUserProfile(userProfile);
-            return (null != chatterBoxService.getPubNub());
+        chatterBoxService.setCurrentUserProfile(userProfile);
+        return (null != chatterBoxService.getPubNub());
     }
 
 }

@@ -1,9 +1,10 @@
 package com.pubnub.chatterbox.domain;
 
 
-import java.util.Date;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
+import java.util.Date;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -33,11 +34,11 @@ public class ChatterBoxMessage {
     }
 
     public static ChatterBoxMessage create(String jsonMessage, String timeToken) throws Exception {
-        ChatterBoxMessage message = gson.fromJson(jsonMessage,ChatterBoxMessage.class);
+        ChatterBoxMessage message = gson.fromJson(jsonMessage, ChatterBoxMessage.class);
         return message;
     }
 
-    public static String toJSON(ChatterBoxMessage m){
+    public static String toJSON(ChatterBoxMessage m) {
         return gson.toJson(m);
     }
 

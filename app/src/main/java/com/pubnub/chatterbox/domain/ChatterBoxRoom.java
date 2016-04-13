@@ -4,7 +4,6 @@ package com.pubnub.chatterbox.domain;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 
 @Getter
 @Setter

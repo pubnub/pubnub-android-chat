@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.experimental.Builder;
 import lombok.extern.slf4j.Slf4j;
 
 @Getter
@@ -21,8 +20,8 @@ public class ChatterBoxPresenceMessage {
     private String uuid;
 
 
-    public static ChatterBoxPresenceMessage create(String json){
-        return gson.fromJson(json,ChatterBoxPresenceMessage.class);
+    public static ChatterBoxPresenceMessage create(String json) {
+        return gson.fromJson(json, ChatterBoxPresenceMessage.class);
     }
 
 }

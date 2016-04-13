@@ -36,9 +36,9 @@ public class ChatMessageListArrayAdapter extends ArrayAdapter<ChatterBoxMessage>
         ChatterBoxMessage message = getItem(position);
         View returnedView = null;
         if ((convertView == null) || (convertView.getId() != R.layout.chat_message_item)) {
-            LayoutInflater inflator =
+            LayoutInflater inflater =
                     (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            returnedView = inflator.inflate(R.layout.chat_message_item, null);
+            returnedView = inflater.inflate(R.layout.chat_message_item, null);
         } else {
             returnedView = convertView;
         }

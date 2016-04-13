@@ -3,9 +3,6 @@ package com.pubnub.chatterbox.profile;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.pubnub.chatterbox.domain.ChatterBoxUserProfile;
 
-/**
- * Created by Frederick on 5/14/15.
- */
 public abstract class AbstractUserProfileBuilder {
 
     public static AbstractUserProfileBuilder getInstance(Object o) {

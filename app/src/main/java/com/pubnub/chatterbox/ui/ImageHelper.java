@@ -10,11 +10,6 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 
-/**
- * Created by Frederick on 5/01/15.
- * re used this from http://stackoverflow.com/questions/2459916/how-to-make-an-imageview-with-rounded-corners
- * Thank you
- */
 public class ImageHelper {
     public static Bitmap getRoundedCornerBitmap(Bitmap bitmap, int pixels) {
         Bitmap output = Bitmap.createBitmap(bitmap.getWidth(), bitmap

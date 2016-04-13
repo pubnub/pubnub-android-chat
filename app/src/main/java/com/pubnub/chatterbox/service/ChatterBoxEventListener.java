@@ -10,7 +10,7 @@ import com.pubnub.chatterbox.domain.ChatterBoxPresenceMessage;
  * ChatterBox service interacts with channels across PubNub to
  * send and receive real-time instant messaging. This interface
  * is invoked when significant events occur.
- *
+ * <p/>
  * support@pubnub.com
  */
 public interface ChatterBoxEventListener {

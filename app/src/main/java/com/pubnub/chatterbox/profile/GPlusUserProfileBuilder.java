@@ -5,9 +5,6 @@ import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
 import com.pubnub.chatterbox.domain.ChatterBoxUserProfile;
 
-/**
- * Created by Frederick on 5/14/15.
- */
 public class GPlusUserProfileBuilder extends AbstractUserProfileBuilder {
 
     private GoogleApiClient googleApiClient;
