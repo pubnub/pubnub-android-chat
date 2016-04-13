@@ -3,7 +3,7 @@ package com.pubnub.chatterbox.profile;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
-import com.pubnub.chatterbox.domain.UserProfile;
+import com.pubnub.chatterbox.domain.ChatterBoxUserProfile;
 
 /**
  * Created by Frederick on 5/14/15.
@@ -17,9 +17,9 @@ public class GPlusUserProfileBuilder extends AbstractUserProfileBuilder {
         this.googleApiClient = googleApiClient;
     }
 
-    public UserProfile build() {
+    public ChatterBoxUserProfile build() {
 
-        UserProfile newUserProfile = new UserProfile();
+        ChatterBoxUserProfile newUserProfile = new ChatterBoxUserProfile();
         String email = Plus.AccountApi.getAccountName(googleApiClient);
         newUserProfile.setEmail(email);
 

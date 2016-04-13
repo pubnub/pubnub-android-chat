@@ -44,7 +44,6 @@
             android:orientation="vertical">
 
 
-
             <LinearLayout
                 android:id="@+id/plus_sign_out_buttons"
                 android:layout_width="match_parent"

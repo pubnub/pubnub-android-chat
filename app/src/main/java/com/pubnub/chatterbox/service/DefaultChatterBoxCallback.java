@@ -2,51 +2,34 @@ package com.pubnub.chatterbox.service;
 
 import com.pubnub.chatterbox.domain.ChatterBoxMessage;
 import com.pubnub.chatterbox.domain.ChatterBoxPresenceMessage;
-import com.pubnub.chatterbox.domain.ChatterBoxPrivateChatRequest;
 
-/**
- * Created by Frederick on 5/14/15.
- */
-
-public class DefaultChatterBoxCallback implements ChatterBoxCallback {
+public class DefaultChatterBoxCallback implements ChatterBoxEventListener {
 
     @Override
-    public void onMessage(ChatterBoxMessage message) {
+    public void messageReceived(ChatterBoxMessage message) {
 
     }
 
     @Override
-    public void onMessagePublished(String timeToken) {
+    public void messagePublished(String timeToken) {
+    }
+
+    @Override
+    public void presenceEventReceived(ChatterBoxPresenceMessage pmessage) {
 
     }
 
     @Override
-    public void onPresence(ChatterBoxPresenceMessage pmessage) {
+    public void heartbeat(boolean error) {
 
     }
 
     @Override
-    public void onHeartBeat(boolean error) {
+    public void errorReceived(String e) {
 
     }
 
-    @Override
-    public void onError(String e) {
 
-    }
 
-    @Override
-    public void onPrivateChatRequest(ChatterBoxPrivateChatRequest request) {
 
-    }
-
-    @Override
-    public void onDisconnect() {
-
-    }
-
-    @Override
-    public void onConnect() {
-
-    }
 }

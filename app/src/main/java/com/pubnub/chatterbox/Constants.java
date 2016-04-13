@@ -9,6 +9,7 @@ public class Constants {
 
     //Activity Request Codes
     public static final int SIGN_IN_REQUEST = 4000; //4k seems like a good number
+    public static final int REQUEST_PERMISSIONS_READ_CONTACTS = 20032;
 
     //Keys for intent extras
     public static final String CURRENT_USER_PROFILE = "_current_userprofile";

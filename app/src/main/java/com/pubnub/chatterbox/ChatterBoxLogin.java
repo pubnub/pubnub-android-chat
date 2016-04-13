@@ -26,7 +26,7 @@ import android.widget.EditText;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.SignInButton;
-import com.pubnub.chatterbox.domain.UserProfile;
+import com.pubnub.chatterbox.domain.ChatterBoxUserProfile;
 import com.pubnub.chatterbox.profile.AbstractUserProfileBuilder;
 
 import java.util.ArrayList;
@@ -156,7 +156,7 @@ public class ChatterBoxLogin extends PlusBaseActivity implements LoaderCallbacks
 
             Log.d(Constants.LOGT, "Success login");
 
-            UserProfile userProfile = new UserProfile();
+            ChatterBoxUserProfile userProfile = new ChatterBoxUserProfile();
             userProfile.setUserName(userName);
             userProfile.setEmail(email);
             userProfile.setFirstName(firstName);
@@ -238,7 +238,7 @@ public class ChatterBoxLogin extends PlusBaseActivity implements LoaderCallbacks
         });
 
         AbstractUserProfileBuilder profileBuilder = AbstractUserProfileBuilder.getInstance(getmGoogleApiClientt());
-        UserProfile currentUserProfile = profileBuilder.build();
+        ChatterBoxUserProfile currentUserProfile = profileBuilder.build();
 
         Intent resultIntent = new Intent(this, this.getClass());
         resultIntent.putExtra(Constants.CURRENT_USER_PROFILE, currentUserProfile);
@@ -389,7 +389,7 @@ public class ChatterBoxLogin extends PlusBaseActivity implements LoaderCallbacks
             if (success) {
                 Log.d(Constants.LOGT, "Success login");
 
-                UserProfile userProfile = new UserProfile();
+                ChatterBoxUserProfile userProfile = new ChatterBoxUserProfile();
                 userProfile.setUserName(mUserName);
                 userProfile.setEmail(mEmail);
                 userProfile.setFirstName(mFirstName);

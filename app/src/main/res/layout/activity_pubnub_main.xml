@@ -5,7 +5,6 @@
     android:id="@+id/main_layout">
 
 
-
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/mainDrawerLayout"
         android:layout_centerVertical="true"
@@ -32,17 +31,16 @@
                 android:layout_marginRight="16dp"
                 android:layout_marginTop="1dp"
                 android:paddingTop="?attr/actionBarSize"
-                android:layout_width="match_parent">
-            </FrameLayout>
+                android:layout_width="match_parent"></FrameLayout>
 
         </RelativeLayout>
 
-         <FrameLayout
-             android:id="@+id/whos_online_fragment_container"
-             android:layout_height="match_parent"
-             android:layout_width="280dp"
-             android:layout_gravity="start"
-             android:background="#FFFFFF"/>
+        <FrameLayout
+            android:id="@+id/whos_online_fragment_container"
+            android:layout_height="match_parent"
+            android:layout_width="280dp"
+            android:layout_gravity="start"
+            android:background="#FFFFFF" />
 
     </android.support.v4.widget.DrawerLayout>
 

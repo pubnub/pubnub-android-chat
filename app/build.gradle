@@ -4,9 +4,10 @@ apply plugin: 'com.google.gms.google-services'
 android {
     compileSdkVersion 23
     buildToolsVersion '23.0.2'
+
     defaultConfig {
         applicationId "com.pubnub.chatterbox"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
@@ -14,34 +15,36 @@ android {
     buildTypes {
         release {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            buildConfigField "String", "SUBSCRIBE_KEY",  "\"sub-c-fe751e2c-7f9a-11e4-812f-02ee2ddab7fe\""
-            buildConfigField "String", "PUBLISH_KEY",  "\"pub-c-d556cb89-980c-4b6c-8621-472409996277\""
-            buildConfigField "String", "GCM_PROJECT_ID",  "\"347849282940\""
-       }
+            buildConfigField "String", "SUBSCRIBE_KEY", "\"sub-c-b7fbd03e-00dc-11e6-b552-02ee2ddab7fe\""
+            buildConfigField "String", "PUBLISH_KEY", "\"pub-c-349a91db-998e-4c5b-8189-92a12bcbd813\""
+            buildConfigField "String", "GCM_PROJECT_ID", "\"347849282940\""
+        }
 
         debug {
-            buildConfigField "String", "SUBSCRIBE_KEY",  "\"demo\""
-            buildConfigField "String", "PUBLISH_KEY",  "\"demo\""
-            buildConfigField "String", "GCM_PROJECT_ID",  "\"347849282940\""
+            buildConfigField "String", "SUBSCRIBE_KEY", "\"sub-c-b7fbd03e-00dc-11e6-b552-02ee2ddab7fe\""
+            buildConfigField "String", "PUBLISH_KEY", "\"pub-c-349a91db-998e-4c5b-8189-92a12bcbd813\""
+            buildConfigField "String", "GCM_PROJECT_ID", "\"347849282940\""
         }
     }
-
 
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile 'com.android.support:appcompat-v7:23.+'
+    compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.android.support:percent:23.0.0'
     compile 'com.android.support:design:23.+'
 
     compile 'com.google.android.gms:play-services:7.8.+'
 
     compile 'com.pubnub:pubnub-android-debug:3.7.8'
-
+    compile 'org.slf4j:slf4j-android:1.7.21'
 
 
     compile 'com.google.code.gson:gson:2.5'
-    compile 'com.facebook.android:facebook-android-sdk:4.0.0'
+    compile 'com.jakewharton:butterknife:7.0.1'
+    provided "org.projectlombok:lombok:1.12.6"
+
+
 }

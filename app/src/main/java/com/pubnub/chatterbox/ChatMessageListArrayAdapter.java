@@ -13,7 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.pubnub.chatterbox.domain.ChatterBoxMessage;
-import com.pubnub.chatterbox.domain.UserProfile;
+import com.pubnub.chatterbox.domain.ChatterBoxUserProfile;
 
 import java.util.Calendar;
 import java.util.List;
@@ -22,10 +22,10 @@ import java.util.List;
 public class ChatMessageListArrayAdapter extends ArrayAdapter<ChatterBoxMessage> {
 
 
-    private UserProfile userProfile;
+    private ChatterBoxUserProfile userProfile;
 
 
-    public ChatMessageListArrayAdapter(Context context, int textViewResourceId, List<ChatterBoxMessage> objects, UserProfile userProfile) {
+    public ChatMessageListArrayAdapter(Context context, int textViewResourceId, List<ChatterBoxMessage> objects, ChatterBoxUserProfile userProfile) {
         super(context, textViewResourceId, objects);
         this.userProfile = userProfile;
     }
@@ -64,7 +64,7 @@ public class ChatMessageListArrayAdapter extends ArrayAdapter<ChatterBoxMessage>
         Calendar c = Calendar.getInstance();
         c.setTime(message.getSentOn());
         String DATEFMT = "HH:MM";
-        messageSentOn.setText(DateFormat.format(DATEFMT,c));
+        messageSentOn.setText(DateFormat.format(DATEFMT, c));
 
         return returnedView;
     }

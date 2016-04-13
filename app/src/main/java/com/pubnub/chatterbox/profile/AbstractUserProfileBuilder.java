@@ -1,7 +1,7 @@
 package com.pubnub.chatterbox.profile;
 
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.pubnub.chatterbox.domain.UserProfile;
+import com.pubnub.chatterbox.domain.ChatterBoxUserProfile;
 
 /**
  * Created by Frederick on 5/14/15.
@@ -21,7 +21,7 @@ public abstract class AbstractUserProfileBuilder {
         return null;
     }
 
-    public abstract UserProfile build();
+    public abstract ChatterBoxUserProfile build();
 
 
 }
