@@ -1,7 +1,8 @@
-package com.pubnub.chatterbox.service;
+package com.pubnub.chatterbox.service.client;
 
 import com.pubnub.chatterbox.domain.ChatterBoxMessage;
 import com.pubnub.chatterbox.domain.ChatterBoxPresenceMessage;
+import com.pubnub.chatterbox.service.ChatterBoxEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,9 +11,8 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
-
 @Slf4j
-public class ChatterboxClientManager {
+public class EventManager {
 
     private Map<String, List<ChatterBoxEventListener>> eventListeners = new HashMap<>();
 
@@ -28,7 +28,7 @@ public class ChatterboxClientManager {
     }
 
     public void removeEventListener(String room, ChatterBoxEventListener evListener) {
-            getListeners(room).remove(evListener);
+        getListeners(room).remove(evListener);
     }
 
     public void addEventListener(String room, ChatterBoxEventListener evlistener) {

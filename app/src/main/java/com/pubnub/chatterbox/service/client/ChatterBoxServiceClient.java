@@ -11,7 +11,6 @@ import com.pubnub.chatterbox.domain.ChatterBoxPresenceMessage;
 import com.pubnub.chatterbox.domain.ChatterBoxUserProfile;
 import com.pubnub.chatterbox.service.ChatterBoxEventListener;
 import com.pubnub.chatterbox.service.ChatterBoxService;
-import com.pubnub.chatterbox.service.ChatterboxClientManager;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -22,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ChatterBoxServiceClient extends Binder {
 
     private ChatterBoxService chatterBoxService;
-    private final ChatterboxClientManager clientManager = new ChatterboxClientManager();
+    private final EventManager eventManager = new EventManager();
 
     private final Callback subscribeCallback = new Callback() {
         @Override
@@ -30,7 +29,7 @@ public class ChatterBoxServiceClient extends Binder {
             try {
                 log.debug("received message on channel: {0} of \n{1}", channel, message);
                 ChatterBoxMessage msg = ChatterBoxMessage.create(message.toString(), timeToken);
-                clientManager.dispatchMessageReceived(channel, msg);
+                eventManager.dispatchMessageReceived(channel, msg);
             } catch (Exception e) {
                 log.error("Exception while processing message", e);
             }
@@ -40,7 +39,7 @@ public class ChatterBoxServiceClient extends Binder {
     private final Callback publishCallback = new Callback() {
         @Override
         public void successCallback(String channel, Object message, String timetoken) {
-            clientManager.dispathMessagePublished(channel, timetoken);
+            eventManager.dispathMessagePublished(channel, timetoken);
         }
     };
 
@@ -50,9 +49,9 @@ public class ChatterBoxServiceClient extends Binder {
         public void successCallback(String channel, Object message) {
             super.successCallback(channel, message);
             log.info("successCallback for presence");
-            String messageStr = ((JSONObject) message).toString();
+            String messageStr = message.toString();
             ChatterBoxPresenceMessage presenceMessage = ChatterBoxPresenceMessage.create(messageStr);
-            clientManager.dispatchPresenceEvent(channel, presenceMessage);
+            eventManager.dispatchPresenceEvent(channel, presenceMessage);
         }
     };
 
@@ -67,7 +66,7 @@ public class ChatterBoxServiceClient extends Binder {
                 for (int idx = 0; idx < messages.length(); ++idx) {
                     JSONObject m = (JSONObject) messages.get(idx);
                     ChatterBoxMessage chatterBoxMessage = ChatterBoxMessage.create(m.toString(), m.getString("timeToken"));
-                    clientManager.dispatchMessageReceived(channel, chatterBoxMessage);
+                    eventManager.dispatchMessageReceived(channel, chatterBoxMessage);
                 }
             } catch (Exception e) {
                 log.error("Exception processing history", e);
@@ -80,7 +79,7 @@ public class ChatterBoxServiceClient extends Binder {
         @Override
         public void successCallback(String channel, Object message) {
             log.info(Constants.LOGT, "unsubscribe to room: " + channel + " successful");
-            //clientManager.dispatchLeaveRoomEvent();
+            //eventManager.dispatchLeaveRoomEvent();
         }
     };
 
@@ -105,7 +104,7 @@ public class ChatterBoxServiceClient extends Binder {
                 Pubnub pubNub = chatterBoxService.getPubNub();
                 pubNub.subscribe(new String[]{roomName}, subscribeCallback);
                 pubNub.presence(roomName, presenceCallback);
-                clientManager.addEventListener(roomName, listener);
+                eventManager.addEventListener(roomName, listener);
             }
         } catch (PubnubException e) {
             log.error("Exception while attempting to register to listen to a room");
@@ -113,8 +112,8 @@ public class ChatterBoxServiceClient extends Binder {
     }
 
     public void leaveRoom(String roomName, ChatterBoxEventListener listener) {
-        clientManager.removeEventListener(roomName, listener);
-        if (!clientManager.hasEventListener(roomName)) {
+        eventManager.removeEventListener(roomName, listener);
+        if (!eventManager.hasEventListener(roomName)) {
             chatterBoxService.getPubNub().unsubscribe(roomName, unsubscribeCallback);
         }
     }
@@ -123,5 +122,6 @@ public class ChatterBoxServiceClient extends Binder {
         chatterBoxService.setCurrentUserProfile(userProfile);
         return (null != chatterBoxService.getPubNub());
     }
+
 
 }

@@ -15,14 +15,13 @@ import java.util.Map;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j(topic ="chatterboxService")
+@Log
 public class ChatterBoxService extends Service {
-
-    private final Map<String, List<ChatterBoxEventListener>> listeners = new HashMap<>();
-
     /**
      * One and only  instance of PubNub
      */
@@ -38,6 +37,9 @@ public class ChatterBoxService extends Service {
 
 
     public Pubnub getPubNub() {
+        if(log.isTraceEnabled()){
+            log.trace("entering getPubNub()");
+        }
 
         if ((null == pubnub) && (getCurrentUserProfile() != null)) {
 
