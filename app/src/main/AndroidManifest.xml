@@ -33,7 +33,7 @@
 
 
         <service
-            android:name=".service.ChatterBoxService"
+            android:name=".service.ChatService"
             android:enabled="true"
             android:exported="true" />
 
@@ -59,7 +59,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ChatterBoxLogin"></activity>
+        <activity android:name=".ChatterBoxLogin" />
 
 
     </application>

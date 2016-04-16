@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @Slf4j
 @ToString
-public class ChatterBoxMessage {
+public class ChatMessage {
     private static Gson gson = new GsonBuilder().create();
 
     private String type = "chattmessage";
@@ -28,17 +28,17 @@ public class ChatterBoxMessage {
     private String senderUUID;
 
 
-    public static ChatterBoxMessage create() {
-        ChatterBoxMessage c = new ChatterBoxMessage();
+    public static ChatMessage create() {
+        ChatMessage c = new ChatMessage();
         return c;
     }
 
-    public static ChatterBoxMessage create(String jsonMessage, String timeToken) throws Exception {
-        ChatterBoxMessage message = gson.fromJson(jsonMessage, ChatterBoxMessage.class);
+    public static ChatMessage create(String jsonMessage, String timeToken) throws Exception {
+        ChatMessage message = gson.fromJson(jsonMessage, ChatMessage.class);
         return message;
     }
 
-    public static String toJSON(ChatterBoxMessage m) {
+    public static String toJSON(ChatMessage m) {
         return gson.toJson(m);
     }
 

@@ -24,13 +24,13 @@ import android.view.View;
 import android.view.Window;
 import android.widget.FrameLayout;
 
-import com.pubnub.chatterbox.domain.ChatterBoxRoom;
-import com.pubnub.chatterbox.domain.ChatterBoxUserProfile;
-import com.pubnub.chatterbox.service.ChatterBoxService;
-import com.pubnub.chatterbox.service.client.ChatterBoxServiceClient;
-import com.pubnub.chatterbox.ui.fragments.ChatterBoxRoomHostFragment;
+import com.pubnub.chatterbox.domain.Room;
+import com.pubnub.chatterbox.domain.UserProfile;
+import com.pubnub.chatterbox.service.ChatService;
+import com.pubnub.chatterbox.service.client.ChatServiceClient;
+import com.pubnub.chatterbox.ui.SessionMediator;
+import com.pubnub.chatterbox.ui.fragments.ChatRoomFragment;
 import com.pubnub.chatterbox.ui.fragments.PresenceListFragment;
-import com.pubnub.chatterbox.ui.fragments.RoomHost;
 
 import java.util.HashMap;
 
@@ -40,42 +40,54 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j()
-public class ChatterBoxMainActivity extends AppCompatActivity implements RoomHost {
+@Slf4j(topic = "mainActivity")
+public class ChatterBoxMainActivity extends AppCompatActivity  {
 
     @Getter
-    private ChatterBoxServiceClient chatterBoxServiceClient;
-    @Getter
-    private ChatterBoxUserProfile currentUserProfile;
+    private ChatServiceClient chatServiceClient;
     @Getter
     private PresenceListFragment presenceListFragment;
 
     @Getter
     @Setter
-    private HashMap<String, ChatterBoxRoom> currentRooms = new HashMap<>();
-
+    private HashMap<String, Room> currentRooms = new HashMap<>();
 
     @Bind(R.id.mainDrawerLayout)
     DrawerLayout mDrawLayout;
+
     @Bind(R.id.application_toolbar)
     Toolbar mToolBar;
 
     @Bind(R.id.whos_online_fragment_container)
     FrameLayout mDrawFragmentLayout;
 
-    private ActionBarDrawerToggle mDrawerToggle;
+    private final ActionBarDrawerToggle mDrawerToggle = new ActionBarDrawerToggle(this, mDrawLayout, mToolBar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+
+        @Override
+        public void onDrawerOpened(View drawerView) {
+            super.onDrawerOpened(drawerView);
+            invalidateOptionsMenu();
+        }
+
+        @Override
+        public void onDrawerClosed(View drawerView) {
+            super.onDrawerClosed(drawerView);
+            invalidateOptionsMenu();
+        }
+    };
+
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            chatterBoxServiceClient = (ChatterBoxServiceClient) service;
+            chatServiceClient = (ChatServiceClient) service;
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            log.info("service disconnecting");
-            chatterBoxServiceClient = null;
+            log.trace("service disconnecting");
+            chatServiceClient = null;
         }
     };
 
@@ -89,28 +101,18 @@ public class ChatterBoxMainActivity extends AppCompatActivity implements RoomHos
         return false;
     }
 
-    public void connectedToRoom(String roomChannelForHereNow) {
+    public void changeRooms(Room room) {
 
-        ChatterBoxRoom r = new ChatterBoxRoom();
-        r.setRoomName(roomChannelForHereNow);
-        r.setRoomTitle(roomChannelForHereNow);
-        r.setActive(true);
 
-        currentRooms.put(roomChannelForHereNow, r);
-
-        presenceListFragment = PresenceListFragment.newInstance(currentUserProfile, roomChannelForHereNow);
-        presenceListFragment.setUserProfile(currentUserProfile);
+        presenceListFragment = PresenceListFragment.newInstance(room);
         FragmentManager fm = getFragmentManager();
         FragmentTransaction fragmentTransaction = fm.beginTransaction();
         fragmentTransaction.replace(R.id.whos_online_fragment_container, presenceListFragment);
         fragmentTransaction.commit();
-        getSupportActionBar().setTitle(r.getRoomTitle());
+        getSupportActionBar().setTitle(room.getTitle());
     }
 
 
-    public void disconnectingFromRoom(String roomChannelName) {
-        getCurrentRooms().remove(roomChannelName);
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,29 +124,8 @@ public class ChatterBoxMainActivity extends AppCompatActivity implements RoomHos
         setContentView(R.layout.activity_pubnub_main);
         ButterKnife.bind(this);
 
-        if (null == currentUserProfile) {
-            startActivityForResult(new Intent(this, ChatterBoxLogin.class), Constants.SIGN_IN_REQUEST, null);
-        }
 
-
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawLayout, mToolBar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
-
-            @Override
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                invalidateOptionsMenu();
-            }
-
-            @Override
-            public void onDrawerClosed(View drawerView) {
-                super.onDrawerClosed(drawerView);
-                invalidateOptionsMenu();
-            }
-        };
-
-        mDrawLayout.setDrawerListener(mDrawerToggle);
-
-
+        mDrawLayout.addDrawerListener(mDrawerToggle);
         setSupportActionBar(mToolBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -155,6 +136,11 @@ public class ChatterBoxMainActivity extends AppCompatActivity implements RoomHos
                 mDrawerToggle.syncState();
             }
         });
+
+        if (null == SessionMediator.getInstance().getUserProfile()) {
+            startActivityForResult(new Intent(this, ChatterBoxLogin.class), Constants.SIGN_IN_REQUEST, null);
+        }
+
 
 
     }
@@ -197,7 +183,7 @@ public class ChatterBoxMainActivity extends AppCompatActivity implements RoomHos
     @Override
     public void onStart() {
         super.onStart();
-        Intent intent = new Intent(this, ChatterBoxService.class);
+        Intent intent = new Intent(this, ChatService.class);
         bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
@@ -223,8 +209,8 @@ public class ChatterBoxMainActivity extends AppCompatActivity implements RoomHos
     protected void onActivityResult(int requestCode, int responseCode, Intent intent) {
         if (requestCode == Constants.SIGN_IN_REQUEST) {
             if (responseCode == Activity.RESULT_OK) {
-                currentUserProfile = (ChatterBoxUserProfile) intent.getExtras().getSerializable(Constants.CURRENT_USER_PROFILE);
-                chatterBoxServiceClient.connect(currentUserProfile);
+                UserProfile upr = (UserProfile) intent.getExtras().getSerializable(Constants.CURRENT_USER_PROFILE);
+                chatServiceClient.setUserProfile(upr);
                 addRoom(Constants.MAIN_CHAT_ROOM, "Main");
             }
         }
@@ -232,9 +218,14 @@ public class ChatterBoxMainActivity extends AppCompatActivity implements RoomHos
 
     private void addRoom(String roomName, String roomTitle) {
         //Load up the Message View
+        Room room = new Room();
+        room.setName(roomName);
+        room.setTitle(roomTitle);
+        room.setActive(true);
+
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        ChatterBoxRoomHostFragment roomFragment = ChatterBoxRoomHostFragment.newInstance(currentUserProfile, roomName, roomTitle);
+        ChatRoomFragment roomFragment = ChatRoomFragment.newInstance(room);
         fragmentTransaction.replace(R.id.room_fragment_container, roomFragment);
         fragmentTransaction.commit();
     }

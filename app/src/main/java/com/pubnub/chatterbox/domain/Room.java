@@ -8,10 +8,10 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class ChatterBoxRoom {
+public class Room {
 
-    private String roomName;
-    private String roomTitle;
+    private String name;
+    private String title;
     private String roomID;
     private boolean active;
 }

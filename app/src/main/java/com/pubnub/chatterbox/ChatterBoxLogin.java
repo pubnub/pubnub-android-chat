@@ -23,11 +23,13 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.SignInButton;
-import com.pubnub.chatterbox.domain.ChatterBoxUserProfile;
-import com.pubnub.chatterbox.profile.AbstractUserProfileBuilder;
+import com.pubnub.chatterbox.domain.UserProfile;
+import com.pubnub.chatterbox.profile.UserProfileBuilder;
+import com.pubnub.chatterbox.profile.UserProfileBuilderFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -156,7 +158,7 @@ public class ChatterBoxLogin extends PlusBaseActivity implements LoaderCallbacks
 
             Log.d(Constants.LOGT, "Success login");
 
-            ChatterBoxUserProfile userProfile = new ChatterBoxUserProfile();
+            UserProfile userProfile = new UserProfile();
             userProfile.setUserName(userName);
             userProfile.setEmail(email);
             userProfile.setFirstName(firstName);
@@ -237,8 +239,8 @@ public class ChatterBoxLogin extends PlusBaseActivity implements LoaderCallbacks
             }
         });
 
-        AbstractUserProfileBuilder profileBuilder = AbstractUserProfileBuilder.getInstance(getmGoogleApiClientt());
-        ChatterBoxUserProfile currentUserProfile = profileBuilder.build();
+        UserProfileBuilder profileBuilder = UserProfileBuilderFactory.getInstance(getmGoogleApiClientt());
+        UserProfile currentUserProfile = profileBuilder.build();
 
         Intent resultIntent = new Intent(this, this.getClass());
         resultIntent.putExtra(Constants.CURRENT_USER_PROFILE, currentUserProfile);
@@ -389,7 +391,7 @@ public class ChatterBoxLogin extends PlusBaseActivity implements LoaderCallbacks
             if (success) {
                 Log.d(Constants.LOGT, "Success login");
 
-                ChatterBoxUserProfile userProfile = new ChatterBoxUserProfile();
+                UserProfile userProfile = new UserProfile();
                 userProfile.setUserName(mUserName);
                 userProfile.setEmail(mEmail);
                 userProfile.setFirstName(mFirstName);

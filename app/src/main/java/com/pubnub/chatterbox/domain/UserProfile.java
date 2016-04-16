@@ -10,7 +10,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class ChatterBoxUserProfile implements Serializable {
+public class UserProfile implements Serializable {
 
 
     private String firstName;

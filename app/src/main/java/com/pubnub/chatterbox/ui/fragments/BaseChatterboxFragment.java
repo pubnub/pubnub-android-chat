@@ -8,10 +8,11 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
-import com.pubnub.chatterbox.domain.ChatterBoxUserProfile;
-import com.pubnub.chatterbox.service.ChatterBoxEventListener;
-import com.pubnub.chatterbox.service.ChatterBoxService;
-import com.pubnub.chatterbox.service.client.ChatterBoxServiceClient;
+import com.pubnub.chatterbox.domain.Room;
+import com.pubnub.chatterbox.service.ChatRoomEventListener;
+import com.pubnub.chatterbox.service.ChatService;
+import com.pubnub.chatterbox.service.client.ChatServiceClient;
+import com.pubnub.chatterbox.ui.SessionMediator;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -19,34 +20,30 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j(topic = "baseFragment")
-public class BaseChatterBoxFragment extends Fragment {
+public abstract class BaseChatterBoxFragment extends Fragment {
 
     @Getter
-    private ChatterBoxServiceClient chatterBoxServiceClient;
+    private ChatServiceClient chatterBoxServiceClient;
 
-    @Getter
-    @Setter
-    private ChatterBoxUserProfile userProfile;
 
     @Getter
     @Setter
-    private String roomName;
+    private Room room;
 
     @Setter
-    private ChatterBoxEventListener listener;
+    private ChatRoomEventListener listener;
 
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            chatterBoxServiceClient = (ChatterBoxServiceClient) service;
+            chatterBoxServiceClient = (ChatServiceClient) service;
+            chatterBoxServiceClient.setUserProfile(SessionMediator.getInstance().getUserProfile());
 
-            chatterBoxServiceClient.connect(userProfile);
-
-            if ((roomName != null) && (listener != null)) {
-                chatterBoxServiceClient.joinRoom(roomName, listener);
+            if ((getRoom().getRoomID() != null) && (listener != null)) {
+                chatterBoxServiceClient.joinRoom(getRoom().getRoomID(), listener);
             } else {
-                log.error("roomName is null");
+                log.error("name is null");
             }
         }
 
@@ -56,6 +53,8 @@ public class BaseChatterBoxFragment extends Fragment {
         }
     };
 
+    public abstract ChatRoomEventListener createListener();
+
     public BaseChatterBoxFragment(){
         super();
     }
@@ -63,14 +62,15 @@ public class BaseChatterBoxFragment extends Fragment {
     @Override
     public void onAttach(Context activity) {
         super.onAttach(activity);
-        Intent chatterBoxServiceIntent = new Intent(getActivity(), ChatterBoxService.class);
+        log.trace("entering onAttach(BaseFragment) for {0}", "test");
+        Intent chatterBoxServiceIntent = new Intent(getActivity(), ChatService.class);
         getActivity().bindService(chatterBoxServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        chatterBoxServiceClient.leaveRoom(this.roomName, listener);
+        chatterBoxServiceClient.leaveRoom(room.getRoomID(), listener);
         getActivity().unbindService(serviceConnection);
     }
 

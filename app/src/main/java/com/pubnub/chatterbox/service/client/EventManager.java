@@ -1,8 +1,8 @@
 package com.pubnub.chatterbox.service.client;
 
-import com.pubnub.chatterbox.domain.ChatterBoxMessage;
-import com.pubnub.chatterbox.domain.ChatterBoxPresenceMessage;
-import com.pubnub.chatterbox.service.ChatterBoxEventListener;
+import com.pubnub.chatterbox.domain.ChatMessage;
+import com.pubnub.chatterbox.domain.PresenceMessage;
+import com.pubnub.chatterbox.service.ChatRoomEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,11 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class EventManager {
 
-    private Map<String, List<ChatterBoxEventListener>> eventListeners = new HashMap<>();
+    private Map<String, List<ChatRoomEventListener>> eventListeners = new HashMap<>();
 
-    private List<ChatterBoxEventListener> getListeners(String roomName) {
+    private List<ChatRoomEventListener> getListeners(String roomName) {
         if (!eventListeners.containsKey(roomName)) {
-            eventListeners.put(roomName, new ArrayList<ChatterBoxEventListener>());
+            eventListeners.put(roomName, new ArrayList<ChatRoomEventListener>());
         }
         return eventListeners.get(roomName);
     }
@@ -27,18 +27,18 @@ public class EventManager {
         return getListeners(room).size() >= 1;
     }
 
-    public void removeEventListener(String room, ChatterBoxEventListener evListener) {
+    public void removeEventListener(String room, ChatRoomEventListener evListener) {
         getListeners(room).remove(evListener);
     }
 
-    public void addEventListener(String room, ChatterBoxEventListener evlistener) {
+    public void addEventListener(String room, ChatRoomEventListener evlistener) {
         log.info("adding event listener {0}", evlistener);
         getListeners(room).add(evlistener);
     }
 
-    public void dispatchMessageReceived(String room, ChatterBoxMessage m) {
-        List<ChatterBoxEventListener> listeners = getListeners(room);
-        for (ChatterBoxEventListener ls : listeners) {
+    public void dispatchMessageReceived(String room, ChatMessage m) {
+        List<ChatRoomEventListener> listeners = getListeners(room);
+        for (ChatRoomEventListener ls : listeners) {
             if (ls == null) {
                 log.debug("listener was null on foreach loop");
                 continue;
@@ -49,16 +49,16 @@ public class EventManager {
     }
 
     public void dispathMessagePublished(String room, String m) {
-        List<ChatterBoxEventListener> listeners = getListeners(room);
-        for (ChatterBoxEventListener ls : listeners) {
+        List<ChatRoomEventListener> listeners = getListeners(room);
+        for (ChatRoomEventListener ls : listeners) {
             ls.messagePublished(m);
         }
     }
 
 
-    public void dispatchPresenceEvent(String room, ChatterBoxPresenceMessage m) {
-        List<ChatterBoxEventListener> listeners = getListeners(room);
-        for (ChatterBoxEventListener ls : listeners) {
+    public void dispatchPresenceEvent(String room, PresenceMessage m) {
+        List<ChatRoomEventListener> listeners = getListeners(room);
+        for (ChatRoomEventListener ls : listeners) {
             ls.presenceEventReceived(m);
         }
     }

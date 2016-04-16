@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 @Setter
 @Slf4j
-public class ChatterBoxPresenceMessage {
+public class PresenceMessage {
 
     private static Gson gson = new GsonBuilder().create();
 
@@ -20,8 +20,8 @@ public class ChatterBoxPresenceMessage {
     private String uuid;
 
 
-    public static ChatterBoxPresenceMessage create(String json) {
-        return gson.fromJson(json, ChatterBoxPresenceMessage.class);
+    public static PresenceMessage create(String json) {
+        return gson.fromJson(json, PresenceMessage.class);
     }
 
 }

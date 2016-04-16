@@ -12,28 +12,28 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.pubnub.chatterbox.domain.ChatterBoxMessage;
-import com.pubnub.chatterbox.domain.ChatterBoxUserProfile;
+import com.pubnub.chatterbox.domain.ChatMessage;
+import com.pubnub.chatterbox.domain.UserProfile;
+import com.pubnub.chatterbox.ui.SessionMediator;
 
 import java.util.Calendar;
 import java.util.List;
 
 
-public class ChatMessageListArrayAdapter extends ArrayAdapter<ChatterBoxMessage> {
+public class ChatMessageListArrayAdapter extends ArrayAdapter<ChatMessage> {
 
 
-    private ChatterBoxUserProfile userProfile;
+    private UserProfile userProfile;
 
 
-    public ChatMessageListArrayAdapter(Context context, int textViewResourceId, List<ChatterBoxMessage> objects, ChatterBoxUserProfile userProfile) {
-        super(context, textViewResourceId, objects);
-        this.userProfile = userProfile;
+    public ChatMessageListArrayAdapter(Context context, int textViewResourceId, List<ChatMessage> messages) {
+        super(context, textViewResourceId, messages);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        ChatterBoxMessage message = getItem(position);
+        ChatMessage message = getItem(position);
         View returnedView = null;
         if ((convertView == null) || (convertView.getId() != R.layout.chat_message_item)) {
             LayoutInflater inflater =
@@ -70,8 +70,9 @@ public class ChatMessageListArrayAdapter extends ArrayAdapter<ChatterBoxMessage>
     }
 
 
-    private boolean isMyMessage(ChatterBoxMessage message) {
-        String myProfileID = userProfile.getEmail();
+    private boolean isMyMessage(ChatMessage message) {
+        UserProfile profile = SessionMediator.getInstance().getUserProfile();
+        String myProfileID = profile.getEmail();
         return message.getFrom().equals(myProfileID);
     }
 
