@@ -1,4 +1,4 @@
-package com.pubnub.chatterbox.domain;
+package com.pubnub.chatterbox.entity;
 
 
 import com.google.gson.Gson;
@@ -20,7 +20,8 @@ public class ChatMessage {
 
     private String type = "chattmessage";
     private String ID;
-    private String messageContent;
+    private String content;
+    private String conversation;
     private String from;
     private Date sentOn;
     private String deviceTag;
@@ -29,16 +30,15 @@ public class ChatMessage {
 
 
     public static ChatMessage create() {
-        ChatMessage c = new ChatMessage();
-        return c;
+        return new ChatMessage();
     }
 
     public static ChatMessage create(String jsonMessage, String timeToken) throws Exception {
-        ChatMessage message = gson.fromJson(jsonMessage, ChatMessage.class);
-        return message;
+        return gson.fromJson(jsonMessage, ChatMessage.class);
     }
 
     public static String toJSON(ChatMessage m) {
+        log.debug("chatmessage json: {0}", gson.toJson(m));
         return gson.toJson(m);
     }
 

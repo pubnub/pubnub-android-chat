@@ -12,8 +12,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.pubnub.chatterbox.domain.ChatMessage;
-import com.pubnub.chatterbox.domain.UserProfile;
+import com.pubnub.chatterbox.entity.ChatMessage;
+import com.pubnub.chatterbox.entity.UserProfile;
 import com.pubnub.chatterbox.ui.SessionMediator;
 
 import java.util.Calendar;
@@ -59,7 +59,7 @@ public class ChatMessageListArrayAdapter extends ArrayAdapter<ChatMessage> {
         }
 
 
-        messageText.setText(message.getMessageContent());
+        messageText.setText(message.getContent());
         messageSentBy.setText(message.getFrom());
         Calendar c = Calendar.getInstance();
         c.setTime(message.getSentOn());

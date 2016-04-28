@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.neenbedankt.android-apt'
 
 android {
     compileSdkVersion 23
@@ -15,15 +16,18 @@ android {
     buildTypes {
         release {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            buildConfigField "String", "SUBSCRIBE_KEY", "\"sub-c-b7fbd03e-00dc-11e6-b552-02ee2ddab7fe\""
+            buildConfigField "String", "SUBSCRIBE_KEY", "\"sub-c-856ccee2-ca2d-11e5-8a35-0619f8945a4f\""
             buildConfigField "String", "PUBLISH_KEY", "\"pub-c-349a91db-998e-4c5b-8189-92a12bcbd813\""
-            buildConfigField "String", "GCM_PROJECT_ID", "\"347849282940\""
+            buildConfigField "String", "GCM_PROJECT_ID", "\"159532095668\""
+            buildConfigField "String", "GCM_APIKEY", "\"AIzaSyCHT4BUMcIdbLV8zFPAgNmAARqsxpySZAE\""
+
         }
 
         debug {
-            buildConfigField "String", "SUBSCRIBE_KEY", "\"sub-c-b7fbd03e-00dc-11e6-b552-02ee2ddab7fe\""
-            buildConfigField "String", "PUBLISH_KEY", "\"pub-c-349a91db-998e-4c5b-8189-92a12bcbd813\""
-            buildConfigField "String", "GCM_PROJECT_ID", "\"347849282940\""
+            buildConfigField "String", "SUBSCRIBE_KEY", "\"sub-c-856ccee2-ca2d-11e5-8a35-0619f8945a4f\""
+            buildConfigField "String", "PUBLISH_KEY", "\"pub-c-ab9467c4-ec29-4a0b-81bc-c52bb310da8d\""
+            buildConfigField "String", "GCM_PROJECT_ID", "\"159532095668\""
+            buildConfigField "String", "GCM_APIKEY", "\"AIzaSyCHT4BUMcIdbLV8zFPAgNmAARqsxpySZAE\""
         }
     }
 
@@ -33,6 +37,9 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
 
+    apt 'com.google.dagger:dagger-compiler:2.2'
+    compile 'com.google.dagger:dagger:2.2'
+    provided 'javax.annotation:jsr250-api:1.0'
 
 
 
@@ -40,13 +47,17 @@ dependencies {
 
 
     compile 'com.android.support:appcompat-v7:23.3.0'
-    compile 'com.android.support:percent:23.0.0'
+    compile 'com.android.support:percent:23.3.0'
     compile 'com.android.support:design:23.3.0'
+
     compile 'com.google.android.gms:play-services:8.4.0'
+
     compile 'com.pubnub:pubnub-android-debug:3.7.8'
     compile 'org.slf4j:slf4j-android:1.7.21'
     compile 'com.google.code.gson:gson:2.5'
     compile 'com.jakewharton:butterknife:7.0.1'
+
+    compile 'io.reactivex:rxjava:1.0.10'
 
     compile 'com.google.android.gms:play-services:8.4.0'
     //'compile 'com.google.android.gms:play-services-ads:8.4.0'

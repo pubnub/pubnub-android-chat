@@ -1,7 +1,7 @@
 package com.pubnub.chatterbox.service.client;
 
-import com.pubnub.chatterbox.domain.ChatMessage;
-import com.pubnub.chatterbox.domain.PresenceMessage;
+import com.pubnub.chatterbox.entity.ChatMessage;
+import com.pubnub.chatterbox.entity.PresenceMessage;
 import com.pubnub.chatterbox.service.ChatRoomEventListener;
 
 import java.util.ArrayList;
@@ -11,8 +11,8 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
-public class EventManager {
+@Slf4j(topic="eventDispatcher")
+public class EventDispatcher {
 
     private Map<String, List<ChatRoomEventListener>> eventListeners = new HashMap<>();
 
@@ -33,6 +33,7 @@ public class EventManager {
 
     public void addEventListener(String room, ChatRoomEventListener evlistener) {
         log.info("adding event listener {0}", evlistener);
+        List<ChatRoomEventListener> listeners = getListeners(room);
         getListeners(room).add(evlistener);
     }
 
@@ -41,7 +42,6 @@ public class EventManager {
         for (ChatRoomEventListener ls : listeners) {
             if (ls == null) {
                 log.debug("listener was null on foreach loop");
-                continue;
             } else {
                 ls.messageReceived(m);
             }
@@ -60,6 +60,13 @@ public class EventManager {
         List<ChatRoomEventListener> listeners = getListeners(room);
         for (ChatRoomEventListener ls : listeners) {
             ls.presenceEventReceived(m);
+        }
+    }
+
+    public void dispatchError(String room, String errorMessage) {
+        List<ChatRoomEventListener> listeners = getListeners(room);
+        for (ChatRoomEventListener ls : listeners) {
+            ls.errorReceived(room);
         }
     }
 

@@ -8,7 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.pubnub.chatterbox.R;
-import com.pubnub.chatterbox.domain.UserProfile;
+import com.pubnub.chatterbox.entity.UserProfile;
 
 import java.util.List;
 

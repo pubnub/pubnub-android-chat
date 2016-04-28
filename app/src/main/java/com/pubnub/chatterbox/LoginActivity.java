@@ -27,7 +27,7 @@ import android.widget.EditText;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.SignInButton;
-import com.pubnub.chatterbox.domain.UserProfile;
+import com.pubnub.chatterbox.entity.UserProfile;
 import com.pubnub.chatterbox.profile.UserProfileBuilder;
 import com.pubnub.chatterbox.profile.UserProfileBuilderFactory;
 
@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ChatterBoxLogin extends PlusBaseActivity implements LoaderCallbacks<Cursor> {
+public class LoginActivity extends PlusBaseActivity implements LoaderCallbacks<Cursor> {
 
 
     private UserLoginTask mAuthTask = null;
@@ -330,7 +330,7 @@ public class ChatterBoxLogin extends PlusBaseActivity implements LoaderCallbacks
     private void addEmailsToAutoComplete(List<String> emailAddressCollection) {
         //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
         ArrayAdapter<String> adapter =
-                new ArrayAdapter<String>(ChatterBoxLogin.this,
+                new ArrayAdapter<String>(LoginActivity.this,
                         android.R.layout.simple_dropdown_item_1line, emailAddressCollection);
 
         mEmailView.setAdapter(adapter);

@@ -8,10 +8,10 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 
 import com.pubnub.chatterbox.R;
-import com.pubnub.chatterbox.domain.PresenceMessage;
-import com.pubnub.chatterbox.domain.UserProfile;
+import com.pubnub.chatterbox.entity.PresenceMessage;
+import com.pubnub.chatterbox.entity.UserProfile;
 
-import com.pubnub.chatterbox.domain.Room;
+import com.pubnub.chatterbox.entity.Room;
 import com.pubnub.chatterbox.service.ChatRoomEventListener;
 import com.pubnub.chatterbox.service.DefaultChatRoomEventListener;
 

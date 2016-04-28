@@ -1,7 +1,7 @@
 package com.pubnub.chatterbox.profile;
 
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.pubnub.chatterbox.domain.UserProfile;
+import com.pubnub.chatterbox.entity.UserProfile;
 
 public abstract class UserProfileBuilderFactory {
 
@@ -10,10 +10,10 @@ public abstract class UserProfileBuilderFactory {
             GooglePlusUserProfileBuilder gbuilder = new GooglePlusUserProfileBuilder();
             gbuilder.setGoogleApiClient((GoogleApiClient) o);
             return gbuilder;
+        }else{
+            return null;
         }
 
-
-        return null;
     }
 
 

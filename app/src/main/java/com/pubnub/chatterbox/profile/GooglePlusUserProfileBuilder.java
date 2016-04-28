@@ -3,7 +3,7 @@ package com.pubnub.chatterbox.profile;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.model.people.Person;
-import com.pubnub.chatterbox.domain.UserProfile;
+import com.pubnub.chatterbox.entity.UserProfile;
 
 public class GooglePlusUserProfileBuilder extends UserProfileBuilder {
 
@@ -22,14 +22,17 @@ public class GooglePlusUserProfileBuilder extends UserProfileBuilder {
 
         if (Plus.PeopleApi.getCurrentPerson(googleApiClient) != null) {
             Person currentPerson = Plus.PeopleApi.getCurrentPerson(googleApiClient);
-            newUserProfile.setUserName(currentPerson.getDisplayName());
+
+            String userName = currentPerson.getName().getGivenName().toLowerCase()
+                    + currentPerson.getName().getFamilyName().toLowerCase();
+
+            newUserProfile.setUserName(userName);
             newUserProfile.setFirstName(currentPerson.getName().getGivenName());
             newUserProfile.setLastName(currentPerson.getName().getFamilyName());
             newUserProfile.setImageURL(currentPerson.getImage().getUrl());
-            return (newUserProfile);
         }
 
 
-        return null;
+        return newUserProfile;
     }
 }

@@ -8,10 +8,11 @@ import android.widget.AbsListView;
 
 import com.pubnub.chatterbox.ChatMessageListArrayAdapter;
 import com.pubnub.chatterbox.R;
-import com.pubnub.chatterbox.domain.ChatMessage;
-import com.pubnub.chatterbox.domain.Room;
+import com.pubnub.chatterbox.entity.ChatMessage;
+import com.pubnub.chatterbox.entity.Room;
 import com.pubnub.chatterbox.service.ChatRoomEventListener;
 import com.pubnub.chatterbox.service.DefaultChatRoomEventListener;
+import com.pubnub.chatterbox.service.client.ChatServiceClient;
 
 import java.util.ArrayList;
 
@@ -57,8 +58,9 @@ public class MessageListFragment extends BaseChatterBoxFragment {
         super();
     }
 
-    public static MessageListFragment newInstance(Room room) {
+    public static MessageListFragment newInstance(Room room, ChatServiceClient client) {
         MessageListFragment fragment = new MessageListFragment();
+        fragment.setChatServiceClient(client);
         fragment.setRoom(room);
         return fragment;
     }
@@ -83,6 +85,7 @@ public class MessageListFragment extends BaseChatterBoxFragment {
         View view = inflater.inflate(R.layout.fragment_chattmessage_list, container, false);
         ButterKnife.bind(this, view);
         mListView.setAdapter(mAdapter);
+
         return view;
     }
 

@@ -1,4 +1,4 @@
-package com.pubnub.chatterbox.domain;
+package com.pubnub.chatterbox.entity;
 
 
 import lombok.Getter;

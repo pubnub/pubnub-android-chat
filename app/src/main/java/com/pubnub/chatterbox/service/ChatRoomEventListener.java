@@ -1,8 +1,8 @@
 package com.pubnub.chatterbox.service;
 
 
-import com.pubnub.chatterbox.domain.ChatMessage;
-import com.pubnub.chatterbox.domain.PresenceMessage;
+import com.pubnub.chatterbox.entity.ChatMessage;
+import com.pubnub.chatterbox.entity.PresenceMessage;
 
 
 /**

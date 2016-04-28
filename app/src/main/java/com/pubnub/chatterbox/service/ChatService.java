@@ -1,16 +1,27 @@
 package com.pubnub.chatterbox.service;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+
 import android.os.IBinder;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;
 import com.pubnub.chatterbox.BuildConfig;
+import com.pubnub.chatterbox.entity.UserProfile;
 import com.pubnub.chatterbox.service.client.ChatServiceClient;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+
 
 
 @Slf4j(topic ="chatterboxService")
@@ -20,27 +31,43 @@ public class ChatService extends Service {
      */
     private Pubnub pubnub;
     private ChatServiceClient client;
-
-    @Setter
     @Getter
-    private String userProfileId;
+    @Setter
+    private String deviceToken;
+
+
+    private final BroadcastReceiver tokenBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String token = (String)intent.getExtras().getCharSequence("GCM_TOKEN");
+            setDeviceToken(token);
+        }
+    };
+
+
+    @Getter
+    @Setter
+    private UserProfile userProfile;
+
 
     public ChatService() {
     }
 
 
     public Pubnub getPubNub() {
+        
         if(log.isTraceEnabled()){
             log.trace("entering getPubNub()");
         }
 
-        if ((null == pubnub) && (getUserProfileId() != null)) {
+        if ((null == pubnub) && (getUserProfile() != null)) {
 
             pubnub = new Pubnub(BuildConfig.PUBLISH_KEY,
                                 BuildConfig.SUBSCRIBE_KEY,
                                 false);
 
-            pubnub.setUUID(getUserProfileId());
+            pubnub.setUUID(getUserProfile().getUserName());
+
             pubnub.setNonSubscribeTimeout(60);
             pubnub.setResumeOnReconnect(true);
             pubnub.setMaxRetries(5);
@@ -49,6 +76,11 @@ public class ChatService extends Service {
 
         }
         return pubnub;
+    }
+
+    public void setUserProfile(UserProfile userProfile) {
+        this.userProfile = userProfile;
+
     }
 
     @Override

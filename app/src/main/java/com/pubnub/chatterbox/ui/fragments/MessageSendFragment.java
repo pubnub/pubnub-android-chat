@@ -9,10 +9,11 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import com.pubnub.chatterbox.R;
-import com.pubnub.chatterbox.domain.ChatMessage;
-import com.pubnub.chatterbox.domain.Room;
+import com.pubnub.chatterbox.entity.ChatMessage;
+import com.pubnub.chatterbox.entity.Room;
 import com.pubnub.chatterbox.service.ChatRoomEventListener;
 import com.pubnub.chatterbox.service.DefaultChatRoomEventListener;
+import com.pubnub.chatterbox.service.client.ChatServiceClient;
 import com.pubnub.chatterbox.ui.SessionMediator;
 
 import java.util.Date;
@@ -43,14 +44,15 @@ public class MessageSendFragment extends BaseChatterBoxFragment {
         ChatMessage message = ChatMessage.create();
         message.setDeviceTag("android");
         message.setSenderUUID(sessionMediator.getUserProfile().getId());
-        message.setMessageContent(mMessageEditText.getText().toString());
-        message.setFrom(sessionMediator.getUserProfile().getEmail());
+        message.setContent(mMessageEditText.getText().toString().trim());
+        message.setFrom(sessionMediator.getUserProfile().getUserName());
         message.setSentOn(new Date());
+        message.setConversation(getRoom().getName());
 
-        mMessageEditText.setEnabled(false);
-        mBtnSend.setEnabled(false);
+        //mMessageEditText.setEnabled(false);
+        //mBtnSend.setEnabled(false);
 
-        getChatterBoxServiceClient().publish(getRoom().getRoomID(), message);
+        getChatServiceClient().publish(getRoom().getName(), message);
         mMessageEditText.setText("");
     }
 
@@ -75,8 +77,9 @@ public class MessageSendFragment extends BaseChatterBoxFragment {
         };
     }
 
-    public static MessageSendFragment newInstance(Room room) {
+    public static MessageSendFragment newInstance(Room room, ChatServiceClient client) {
         MessageSendFragment fragment = new MessageSendFragment();
+        fragment.setChatServiceClient(client);
         fragment.setRoom(room);
         return fragment;
     }

@@ -8,7 +8,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
-import com.pubnub.chatterbox.domain.Room;
+import com.pubnub.chatterbox.entity.Room;
 import com.pubnub.chatterbox.service.ChatRoomEventListener;
 import com.pubnub.chatterbox.service.ChatService;
 import com.pubnub.chatterbox.service.client.ChatServiceClient;
@@ -23,7 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class BaseChatterBoxFragment extends Fragment {
 
     @Getter
-    private ChatServiceClient chatterBoxServiceClient;
+    @Setter
+    private ChatServiceClient chatServiceClient;
 
 
     @Getter
@@ -34,24 +35,25 @@ public abstract class BaseChatterBoxFragment extends Fragment {
     private ChatRoomEventListener listener;
 
 
-    private ServiceConnection serviceConnection = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            chatterBoxServiceClient = (ChatServiceClient) service;
-            chatterBoxServiceClient.setUserProfile(SessionMediator.getInstance().getUserProfile());
-
-            if ((getRoom().getRoomID() != null) && (listener != null)) {
-                chatterBoxServiceClient.joinRoom(getRoom().getRoomID(), listener);
-            } else {
-                log.error("name is null");
-            }
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            log.info("service disconnected from fragment");
-        }
-    };
+//    private ServiceConnection serviceConnection = new ServiceConnection() {
+//        @Override
+//        public void onServiceConnected(ComponentName name, IBinder service) {
+//            chatServiceClient = (ChatServiceClient) service;
+//            chatServiceClient.setUserProfile(SessionMediator.getInstance().getUserProfile());
+//            listener = createListener();
+//
+//            if ((getRoom().getName() != null) && (listener != null)) {
+//                chatServiceClient.joinRoom(getRoom().getName(), listener);
+//            } else {
+//                log.error("name is null");
+//            }
+//        }
+//
+//        @Override
+//        public void onServiceDisconnected(ComponentName name) {
+//            log.info("service disconnected from fragment");
+//        }
+//    };
 
     public abstract ChatRoomEventListener createListener();
 
@@ -60,18 +62,22 @@ public abstract class BaseChatterBoxFragment extends Fragment {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        getChatServiceClient().joinRoom(getRoom().getName(),createListener());
+    }
+
+    @Override
     public void onAttach(Context activity) {
         super.onAttach(activity);
         log.trace("entering onAttach(BaseFragment) for {0}", "test");
-        Intent chatterBoxServiceIntent = new Intent(getActivity(), ChatService.class);
-        getActivity().bindService(chatterBoxServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
+        getChatServiceClient().joinRoom(getRoom().getName(),createListener());
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        chatterBoxServiceClient.leaveRoom(room.getRoomID(), listener);
-        getActivity().unbindService(serviceConnection);
+        getChatServiceClient().leaveRoom(getRoom().getName(),createListener());
     }
 
 }
