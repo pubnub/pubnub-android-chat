@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 
 
 
-@Slf4j(topic ="chatterboxService")
+@Slf4j(topic ="chatService")
 public class ChatService extends Service {
     /**
      * One and only  instance of PubNub
@@ -77,6 +77,8 @@ public class ChatService extends Service {
         }
         return pubnub;
     }
+
+
 
     public void setUserProfile(UserProfile userProfile) {
         this.userProfile = userProfile;

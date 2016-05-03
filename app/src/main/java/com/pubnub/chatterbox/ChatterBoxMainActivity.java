@@ -232,9 +232,16 @@ public class ChatterBoxMainActivity extends AppCompatActivity  {
             if (responseCode == Activity.RESULT_OK) {
                 UserProfile upr =
                         (UserProfile) intent.getExtras().getSerializable(Constants.CURRENT_USER_PROFILE);
+
+
                 SessionMediator.getInstance().setUserProfile(upr);
                 getChatServiceClient().setUserProfile(upr);
+
+
+
                 addRoom(Constants.MAIN_CHAT_ROOM, "Main");
+
+
 
 
                 //Alternative way
@@ -243,9 +250,10 @@ public class ChatterBoxMainActivity extends AppCompatActivity  {
 
                 //Refresh a token
                 //Intent dtr = new Intent(this, RegistrationIntentService.class);
-
                 //startService(ri);
                 //startService(dtr);
+
+
                 final Context ctx = this;
 
 
@@ -258,6 +266,8 @@ public class ChatterBoxMainActivity extends AppCompatActivity  {
                         try {
                             token = instanceID.getToken(BuildConfig.GCM_PROJECT_ID,
                                     GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
+
+
                             configurePush(token);
                         } catch (IOException e) {
                             //NOTE: handle this error better, this is a demo
@@ -291,15 +301,19 @@ public class ChatterBoxMainActivity extends AppCompatActivity  {
     }
 
     private void configurePush(String token){
+
         SharedPreferences sharedPreferences =
                 PreferenceManager.getDefaultSharedPreferences(this);
+
         String currentToken = sharedPreferences.getString("currentToken", "");
 
+
+
         if(currentToken.equals(token) == false) {
-            sharedPreferences.edit().putBoolean("tokenSent", true);
             sharedPreferences.edit().putString("currentToken",token);
             sharedPreferences.edit().commit();
             getChatServiceClient().enablePushNotification(token);
+
 
         }
     }

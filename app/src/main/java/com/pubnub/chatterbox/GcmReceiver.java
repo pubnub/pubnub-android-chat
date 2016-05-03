@@ -17,9 +17,25 @@ public class GcmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+
+
+//        {
+//            "pn_gcm": {
+//            "data": {
+//                        "title": "You have been mentioned"
+//                        ,"message": "You have been mentioned"
+//                        ,"conversation": "AWG-global"
+//            }
+//        },
+//            "pn_debug": true
+//        }
+
+
         log.debug("your push notification logic goes here");
         CharSequence title = intent.getExtras().getCharSequence("title");
         CharSequence message = intent.getExtras().getCharSequence("message");
+        CharSequence conversation = intent.getExtras().getCharSequence("conversation");
+
         sendNotification(context,message,title);
 
     }
@@ -27,6 +43,7 @@ public class GcmReceiver extends BroadcastReceiver {
     private void sendNotification(Context context, CharSequence title, CharSequence message) {
         Intent intent = new Intent(context, ChatterBoxMainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0 /* Request code */, intent,
                 PendingIntent.FLAG_ONE_SHOT);
 

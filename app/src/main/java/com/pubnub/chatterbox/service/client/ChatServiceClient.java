@@ -197,12 +197,16 @@ public class ChatServiceClient extends Binder {
 
     public void logout() {
         chatService.getPubNub().unsubscribe(chatService.getUserProfile().getUserName(), unsubscribeCallback);
+        chatService.getPubNub().disconnectAndResubscribe();
     }
 
     public boolean setUserProfile(UserProfile userProfile) {
         chatService.setUserProfile(userProfile);
         return (null != chatService.getPubNub());
     }
+
+
+
 
 
 }
