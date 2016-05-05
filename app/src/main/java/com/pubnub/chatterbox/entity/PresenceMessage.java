@@ -15,7 +15,7 @@ public class PresenceMessage {
     private static Gson gson = new GsonBuilder().create();
 
     private String actionType;
-    private String timeToken;
+    private Long timeToken;
     private int occupancyCount;
     private String uuid;
 

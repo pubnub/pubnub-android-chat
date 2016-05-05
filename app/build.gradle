@@ -53,7 +53,9 @@ dependencies {
 
     compile 'com.google.android.gms:play-services:8.4.0'
 
-    compile 'com.pubnub:pubnub-android-debug:3.7.8'
+
+    compile 'com.pubnub:pubnub:4.0.0-beta1'
+
     compile 'org.slf4j:slf4j-android:1.7.21'
     compile 'com.google.code.gson:gson:2.5'
     compile 'com.jakewharton:butterknife:7.0.1'

@@ -33,7 +33,7 @@ public class ChatMessage {
         return new ChatMessage();
     }
 
-    public static ChatMessage create(String jsonMessage, String timeToken) throws Exception {
+    public static ChatMessage create(String jsonMessage, long timeToken) throws Exception {
         return gson.fromJson(jsonMessage, ChatMessage.class);
     }
 
