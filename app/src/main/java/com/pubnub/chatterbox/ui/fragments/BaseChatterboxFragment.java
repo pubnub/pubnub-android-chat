@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j(topic = "baseFragment")
-public abstract class BaseChatterBoxFragment extends Fragment {
+public abstract class BaseChatterboxFragment extends Fragment {
 
     @Getter
     @Setter
@@ -57,7 +57,7 @@ public abstract class BaseChatterBoxFragment extends Fragment {
 
     public abstract ChatRoomEventListener createListener();
 
-    public BaseChatterBoxFragment(){
+    public BaseChatterboxFragment(){
         super();
     }
 

@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j(topic = "PresenceListFragment")
-public class PresenceListFragment extends BaseChatterBoxFragment {
+public class PresenceListFragment extends BaseChatterboxFragment {
 
     @Getter
     private ArrayList<UserProfile> presentUserProfiles = new ArrayList<>();

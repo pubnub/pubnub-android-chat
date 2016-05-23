@@ -36,6 +36,7 @@ public class GcmReceiver extends BroadcastReceiver {
         CharSequence message = intent.getExtras().getCharSequence("message");
         CharSequence conversation = intent.getExtras().getCharSequence("conversation");
 
+
         sendNotification(context,message,title);
 
     }

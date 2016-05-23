@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
-public class ChatRoomFragment extends BaseChatterBoxFragment {
+public class ChatRoomFragment extends BaseChatterboxFragment {
 
     @Setter
     MessageSendFragment chatterBoxMessageSendFragment;

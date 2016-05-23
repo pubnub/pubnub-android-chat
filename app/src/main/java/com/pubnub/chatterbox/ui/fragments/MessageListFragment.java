@@ -22,7 +22,7 @@ import butterknife.ButterKnife;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class MessageListFragment extends BaseChatterBoxFragment {
+public class MessageListFragment extends BaseChatterboxFragment {
 
     private ArrayList<ChatMessage> chatterMessageArray = new ArrayList<>();
 

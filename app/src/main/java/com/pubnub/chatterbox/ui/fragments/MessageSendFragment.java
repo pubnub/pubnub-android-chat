@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
-public class MessageSendFragment extends BaseChatterBoxFragment {
+public class MessageSendFragment extends BaseChatterboxFragment {
 
     @Bind(R.id.message)
     EditText mMessageEditText;

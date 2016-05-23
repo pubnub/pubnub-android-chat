@@ -7,16 +7,11 @@ import android.content.Intent;
 
 import android.os.IBinder;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;
 import com.pubnub.chatterbox.BuildConfig;
 import com.pubnub.chatterbox.entity.UserProfile;
 import com.pubnub.chatterbox.service.client.ChatServiceClient;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -67,7 +62,6 @@ public class ChatService extends Service {
                                 false);
 
             pubnub.setUUID(getUserProfile().getUserName());
-
             pubnub.setNonSubscribeTimeout(60);
             pubnub.setResumeOnReconnect(true);
             pubnub.setMaxRetries(5);
