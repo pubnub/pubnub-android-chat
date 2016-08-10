@@ -32,7 +32,7 @@ public class EventDispatcher {
     }
 
     public void addEventListener(String room, ChatRoomEventListener evlistener) {
-        log.info("adding event listener {0}", evlistener);
+        //log.info("adding event listener {0}", evlistener);
         List<ChatRoomEventListener> listeners = getListeners(room);
         getListeners(room).add(evlistener);
     }
@@ -41,7 +41,7 @@ public class EventDispatcher {
         List<ChatRoomEventListener> listeners = getListeners(room);
         for (ChatRoomEventListener ls : listeners) {
             if (ls == null) {
-                log.debug("listener was null on foreach loop");
+                //log.debug("listener was null on foreach loop");
             } else {
                 ls.messageReceived(m);
             }
@@ -67,6 +67,15 @@ public class EventDispatcher {
         List<ChatRoomEventListener> listeners = getListeners(room);
         for (ChatRoomEventListener ls : listeners) {
             ls.errorReceived(room);
+        }
+    }
+
+    public void dispatchError(List<String> rooms, String errorMessage) {
+        for(String room: rooms) {
+            List<ChatRoomEventListener> listeners = getListeners(room);
+            for (ChatRoomEventListener ls : listeners) {
+                ls.errorReceived(room);
+            }
         }
     }
 

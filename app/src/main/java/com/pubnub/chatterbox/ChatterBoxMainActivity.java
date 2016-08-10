@@ -146,7 +146,6 @@ public class ChatterBoxMainActivity extends AppCompatActivity  {
         setSupportActionBar(mToolBar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-
         mDrawLayout.post(new Runnable() {
             @Override
             public void run() {

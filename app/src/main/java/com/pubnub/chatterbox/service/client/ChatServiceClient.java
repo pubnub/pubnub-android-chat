@@ -2,19 +2,30 @@ package com.pubnub.chatterbox.service.client;
 
 import android.os.Binder;
 
-import com.pubnub.api.Callback;
-import com.pubnub.api.Pubnub;
-import com.pubnub.api.PubnubError;
-import com.pubnub.chatterbox.Constants;
+import com.pubnub.api.PubNub;
+import com.pubnub.api.PubNubException;
+import com.pubnub.api.callbacks.PNCallback;
+import com.pubnub.api.callbacks.SubscribeCallback;
+import com.pubnub.api.endpoints.History;
+import com.pubnub.api.enums.PNPushType;
+import com.pubnub.api.models.consumer.PNPublishResult;
+import com.pubnub.api.models.consumer.PNStatus;
+import com.pubnub.api.models.consumer.history.PNHistoryResult;
+import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
+import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
+
+import com.pubnub.api.models.consumer.push.PNPushAddChannelResult;
 import com.pubnub.chatterbox.entity.ChatMessage;
 import com.pubnub.chatterbox.entity.PresenceMessage;
 import com.pubnub.chatterbox.entity.UserProfile;
 import com.pubnub.chatterbox.service.ChatRoomEventListener;
 import com.pubnub.chatterbox.service.ChatService;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -25,44 +36,53 @@ public class ChatServiceClient extends Binder {
     private ChatService chatService;
     private final EventDispatcher eventDispatcher = new EventDispatcher();
 
-    private final Callback subscribeCallback = new Callback() {
+
+
+    private final SubscribeCallback subscribeCallback = new SubscribeCallback() {
+
+
         @Override
-        public void successCallback(String channel, Object message, String timeToken) {
+        public void message(PubNub pubnub, PNMessageResult msg) {
+            String msgText = msg.getMessage().asText();
+            String actualChannel = msg.getMessage().asText();
+            long timeToken = msg.getTimetoken();
+
+            log.debug("received message on channel: {0} of \n{1}", msg.getActualChannel(), msg.getMessage().asText());
             try {
-                log.debug("received message on channel: {0} of \n{1}", channel, message);
-                ChatMessage msg = ChatMessage.create(message.toString(), timeToken);
-                eventDispatcher.dispatchMessageReceived(channel, msg);
-            } catch (Exception e) {
-                log.error("Exception while processing message", e);
+                ChatMessage chatMessage = ChatMessage.create(msgText, timeToken);
+                eventDispatcher.dispatchMessageReceived(actualChannel, chatMessage);
+            }catch(Exception e){
+                log.error("exception while attempting to dispatch received message",e);
             }
-        }
-    };
 
-    private final Callback publishCallback = new Callback() {
-        @Override
-        public void successCallback(String channel, Object message, String timetoken) {
-            eventDispatcher.dispathMessagePublished(channel, timetoken);
         }
 
         @Override
-        public void errorCallback(String channel, PubnubError error) {
-            eventDispatcher.dispatchError(channel, error.getErrorString());
+        public void status(PubNub pubnub, PNStatus status) {
+            if(status.isError()){
+                String[] channels = (String[])status.getAffectedChannels().toArray();
+                eventDispatcher.dispatchError(status.getAffectedChannels(),status.getErrorData().getInformation());
+            }
+
         }
-    };
 
-
-    private final Callback presenceCallback = new Callback() {
         @Override
-        public void successCallback(String channel, Object message) {
-            super.successCallback(channel, message);
+        public void presence(PubNub pubnub, PNPresenceEventResult presence) {
+
             log.info("successCallback for presence");
-            String messageStr = message.toString();
+            String messageStr = presence.toString();
             PresenceMessage presenceMessage = PresenceMessage.create(messageStr);
-            eventDispatcher.dispatchPresenceEvent(channel, presenceMessage);
+            eventDispatcher.dispatchPresenceEvent(presence.getActualChannel(), presenceMessage);
+
+
         }
+
+
     };
 
-    private final Callback historyCallback = new Callback() {
+
+
+    /*private final Callback historyCallback = new Callback() {
         @Override
         public void successCallback(String channel, Object message) {
             super.successCallback(channel, message);
@@ -79,33 +99,16 @@ public class ChatServiceClient extends Binder {
                 log.error("Exception processing history", e);
             }
         }
-    };
+    };*/
 
 
-    private final Callback heartBeatCallback = new Callback() {
+    /*private final Callback heartBeatCallback = new Callback() {
         @Override
         public void successCallback(String channel, Object message) {
             log.debug("heartbeat sent successfully");
         }
-    };
+    };*/
 
-
-    private final Callback unsubscribeCallback = new Callback() {
-        @Override
-        public void successCallback(String channel, Object message) {
-            log.info(Constants.LOGT, "unsubscribe to room: " + channel + " successful");
-            //eventDispatcher.dispatchLeaveRoomEvent();
-        }
-    };
-
-    private final Callback loggingCallback = new Callback() {
-        @Override
-        public void successCallback(String channel, Object message) {
-            log.info(Constants.LOGT, "call completed");
-        }
-
-
-    };
 
 
     public ChatServiceClient(ChatService service) {
@@ -114,17 +117,39 @@ public class ChatServiceClient extends Binder {
 
 
     public void publish(final String channel, ChatMessage message) {
-        String messageString = ChatMessage.toJSON(message);
+        final String messageString = ChatMessage.toJSON(message);
         log.debug("message: " + messageString);
 
-        chatService.getPubNub().publish(channel, messageString, true, publishCallback);
+        chatService.getPubNub().publish().message(messageString).channel(channel).async(new PNCallback<PNPublishResult>() {
+            @Override
+            public void onResponse(PNPublishResult result, PNStatus status) {
+                if(status.isError()){
+                    eventDispatcher.dispatchError(status.getAffectedChannels(),status.getErrorData().getInformation());
+                }else{
+
+                    eventDispatcher.dispathMessagePublished(channel,messageString);
+                }
+            }
+        });
     }
 
     //Simply Enable Push Notifications for pubnub
     public void enablePushNotification(String token){
         UserProfile profile = chatService.getUserProfile();
         if(profile != null) {
-            chatService.getPubNub().enablePushNotificationsOnChannel(profile.getUserName(), token);
+            List<String> channelsList = new ArrayList<String>();
+
+            channelsList.add(profile.getUserName());
+            try {
+                PNPushAddChannelResult result = chatService.getPubNub().addPushNotificationsOnChannels()
+                        .channels(channelsList)
+                        .deviceId(token)
+                        .pushType(PNPushType.GCM)
+                        .sync();
+
+            }catch(Exception e){
+                log.error("");
+            }
         }
     }
 
@@ -155,32 +180,47 @@ public class ChatServiceClient extends Binder {
         }
 
 
-        chatService.getPubNub().publish(channel, messageString, true, publishCallback);
+        chatService.getPubNub().publish().channel(channel).message(messageString).shouldStore(true);
     }
 
 
     public void history(String channel, long start, long end, int numberOfMessages) {
-        chatService.getPubNub().history(channel, start, end, numberOfMessages, true, false, historyCallback);
+        History history = chatService.getPubNub().history()
+                                                 .channel(channel)
+                                                 .start(start)
+                                                 .end(end)
+                                                 .count( numberOfMessages)
+                                                 .includeTimetoken(true)
+                                                 .reverse(false);
+        try {
+            PNHistoryResult result = history.sync();
+
+        } catch (PubNubException e) {
+            e.printStackTrace();
+        }
     }
 
     public void joinRoom(@NonNull final String roomName, final ChatRoomEventListener listener) {
         try {
 
             if (null != chatService.getPubNub()) {
-                Pubnub pubNub = chatService.getPubNub();
                 UserProfile userProfile = chatService.getUserProfile();
 
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("userName", userProfile.getUserName());
-                jsonObject.put("firstName", userProfile.getFirstName());
-                jsonObject.put("lastName", userProfile.getLastName());
-                jsonObject.put("email", userProfile.getEmail());
-                jsonObject.put("status", "online");
+                List<String> channels = new ArrayList<String>();
+                channels.add(roomName);
 
+                chatService.getPubNub().setPresenceState()
+                                       .channels(channels)
+                                       .state(userProfile).sync();
 
-                pubNub.setState(userProfile.getUserName(), userProfile.getUserName(), jsonObject, loggingCallback);
-                pubNub.subscribe(new String[]{roomName, userProfile.getUserName()}, subscribeCallback);
-                pubNub.presence(roomName, presenceCallback);
+                List<String> channelsList = new ArrayList<String>();
+                channelsList.add(roomName);
+                channelsList.add(userProfile.getUserName());
+
+                chatService.getPubNub().subscribe()
+                                      .withPresence()
+                                      .channels(channelsList).execute();
+
                 eventDispatcher.addEventListener(roomName, listener);
             }
         } catch (Exception e) { //DEMO only...bad
@@ -191,13 +231,17 @@ public class ChatServiceClient extends Binder {
     public void leaveRoom(String roomName, ChatRoomEventListener listener) {
         eventDispatcher.removeEventListener(roomName, listener);
         if (!eventDispatcher.hasEventListener(roomName)) {
-            chatService.getPubNub().unsubscribe(roomName, unsubscribeCallback);
+            List<String> channelsList = new ArrayList<String>();
+            channelsList.add(roomName);
+            chatService.getPubNub().unsubscribe().channels(channelsList).execute();
         }
     }
 
     public void logout() {
-        chatService.getPubNub().unsubscribe(chatService.getUserProfile().getUserName(), unsubscribeCallback);
-        chatService.getPubNub().disconnectAndResubscribe();
+        List<String> channelsList = new ArrayList<String>();
+        channelsList.add(chatService.getUserProfile().getUserName());
+        chatService.getPubNub().unsubscribe().channels(channelsList).execute();
+
     }
 
     public boolean setUserProfile(UserProfile userProfile) {

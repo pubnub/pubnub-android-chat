@@ -7,7 +7,9 @@ import android.content.Intent;
 
 import android.os.IBinder;
 
-import com.pubnub.api.Pubnub;
+import com.pubnub.api.PNConfiguration;
+import com.pubnub.api.PubNub;
+
 import com.pubnub.chatterbox.BuildConfig;
 import com.pubnub.chatterbox.entity.UserProfile;
 import com.pubnub.chatterbox.service.client.ChatServiceClient;
@@ -20,11 +22,12 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j(topic ="chatService")
+@Setter
 public class ChatService extends Service {
     /**
      * One and only  instance of PubNub
      */
-    private Pubnub pubnub;
+    private PubNub pubnub;
     private ChatServiceClient client;
     @Getter
     @Setter
@@ -49,7 +52,7 @@ public class ChatService extends Service {
     }
 
 
-    public Pubnub getPubNub() {
+    public PubNub getPubNub() {
         
         if(log.isTraceEnabled()){
             log.trace("entering getPubNub()");
@@ -57,16 +60,16 @@ public class ChatService extends Service {
 
         if ((null == pubnub) && (getUserProfile() != null)) {
 
-            pubnub = new Pubnub(BuildConfig.PUBLISH_KEY,
-                                BuildConfig.SUBSCRIBE_KEY,
-                                false);
 
-            pubnub.setUUID(getUserProfile().getUserName());
-            pubnub.setNonSubscribeTimeout(60);
-            pubnub.setResumeOnReconnect(true);
-            pubnub.setMaxRetries(5);
-            pubnub.setRetryInterval(10);
-            pubnub.setSubscribeTimeout(20000);
+            PNConfiguration configuration = new PNConfiguration();
+            configuration.setSubscribeKey(BuildConfig.SUBSCRIBE_KEY)
+                         .setPublishKey(BuildConfig.PUBLISH_KEY)
+                         .setUuid(getUserProfile().getUserName())
+                         .setConnectTimeout(60);
+
+
+            pubnub = new PubNub(configuration);
+
 
         }
         return pubnub;
