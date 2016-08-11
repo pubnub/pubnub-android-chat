@@ -52,6 +52,7 @@ public class ChatRoomFragment extends BaseChatterboxFragment {
 
     @Override
     public ChatRoomEventListener createListener() {
+        log.debug("creating default listener");
         return new DefaultChatRoomEventListener();
     }
 

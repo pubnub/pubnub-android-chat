@@ -18,7 +18,7 @@ android {
         release {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             buildConfigField "String", "SUBSCRIBE_KEY", "\"sub-c-856ccee2-ca2d-11e5-8a35-0619f8945a4f\""
-            buildConfigField "String", "PUBLISH_KEY", "\"pub-c-349a91db-998e-4c5b-8189-92a12bcbd813\""
+            buildConfigField "String", "PUBLISH_KEY", "\"pub-c-ab9467c4-ec29-4a0b-81bc-c52bb310da8d\""
             buildConfigField "String", "GCM_PROJECT_ID", "\"159532095668\""
             buildConfigField "String", "GCM_APIKEY", "\"AIzaSyCHT4BUMcIdbLV8zFPAgNmAARqsxpySZAE\""
 

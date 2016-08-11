@@ -82,33 +82,6 @@ public class ChatServiceClient extends Binder {
 
 
 
-    /*private final Callback historyCallback = new Callback() {
-        @Override
-        public void successCallback(String channel, Object message) {
-            super.successCallback(channel, message);
-            try {
-                JSONArray jArray = (JSONArray) message;
-                JSONArray messages = (JSONArray) jArray.get(0);
-
-                for (int idx = 0; idx < messages.length(); ++idx) {
-                    JSONObject m = (JSONObject) messages.get(idx);
-                    ChatMessage chatterBoxMessage = ChatMessage.create(m.toString(), m.getString("timeToken"));
-                    eventDispatcher.dispatchMessageReceived(channel, chatterBoxMessage);
-                }
-            } catch (Exception e) {
-                log.error("Exception processing history", e);
-            }
-        }
-    };*/
-
-
-    /*private final Callback heartBeatCallback = new Callback() {
-        @Override
-        public void successCallback(String channel, Object message) {
-            log.debug("heartbeat sent successfully");
-        }
-    };*/
-
 
 
     public ChatServiceClient(ChatService service) {
@@ -180,7 +153,7 @@ public class ChatServiceClient extends Binder {
         }
 
 
-        chatService.getPubNub().publish().channel(channel).message(messageString).shouldStore(true);
+        chatService.getPubNub().publish().channel(channel).message(messageString).shouldStore(false);
     }
 
 
