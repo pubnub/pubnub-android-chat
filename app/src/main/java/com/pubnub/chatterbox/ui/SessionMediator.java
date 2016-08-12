@@ -1,7 +1,7 @@
 package com.pubnub.chatterbox.ui;
 
-import com.pubnub.chatterbox.entity.UserProfile;
 import com.pubnub.chatterbox.entity.Room;
+import com.pubnub.chatterbox.entity.UserProfile;
 
 import java.util.HashMap;
 import java.util.Map;

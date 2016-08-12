@@ -1,5 +1,6 @@
 package com.pubnub.chatterbox.service.client;
 
+
 import android.os.Binder;
 
 import com.pubnub.api.PubNub;
@@ -13,44 +14,100 @@ import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.history.PNHistoryResult;
 import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
-
 import com.pubnub.api.models.consumer.push.PNPushAddChannelResult;
 import com.pubnub.chatterbox.entity.ChatMessage;
 import com.pubnub.chatterbox.entity.PresenceMessage;
+import com.pubnub.chatterbox.entity.StatusEvent;
 import com.pubnub.chatterbox.entity.UserProfile;
-import com.pubnub.chatterbox.service.ChatRoomEventListener;
 import com.pubnub.chatterbox.service.ChatService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import rx.Observer;
+import rx.Subscriber;
+import rx.functions.Action1;
+import rx.functions.Func1;
+import rx.observers.Subscribers;
+import rx.subjects.PublishSubject;
 
 @Slf4j(topic = "chatServiceClient")
 public class ChatServiceClient extends Binder {
 
     private ChatService chatService;
-    private final EventDispatcher eventDispatcher = new EventDispatcher();
 
+    //Differnt types of events we would like to Observe from our PubNub integration
+    //this could also provide an integration point with other backends, custom Http based services
+    //and additional API's
+
+    @Getter
+    private final PublishSubject<ChatMessage> observableMessageStream = PublishSubject.create();
+    @Getter
+    private final PublishSubject<PresenceMessage> presenceEventStream = PublishSubject.create();
+    @Getter
+    private final PublishSubject<StatusEvent> statusEventStream = PublishSubject.create();
+
+
+
+
+
+
+
+
+    public void messages(final Func1<ChatMessage,Void> chatMessageResponder){
+        Subscriber<ChatMessage> s = Subscribers.create(new Action1<ChatMessage>() {
+            @Override
+            public void call(ChatMessage chatMessage) {
+                chatMessageResponder.call(chatMessage);
+            }
+        });
+
+        observableMessageStream.subscribe(s);
+    }
+
+
+    public void presence(final Func1<PresenceMessage, Void> presenceEventResponder){
+        Subscriber<PresenceMessage> s = Subscribers.create(new Action1<PresenceMessage>() {
+            @Override
+            public void call(PresenceMessage presenceMessage) {
+                presenceEventResponder.call(presenceMessage);
+            }
+        });
+
+        presenceEventStream.subscribe(s);
+    }
+
+    public void status(final Func1<StatusEvent,Void> statusEventResponder){
+        Subscriber<StatusEvent> s = Subscribers.create(new Action1<StatusEvent>() {
+            @Override
+            public void call(StatusEvent statusEvent) {
+                statusEventResponder.call(statusEvent);
+            }
+        });
+
+        statusEventStream.subscribe(s);
+    }
 
 
     private final SubscribeCallback subscribeCallback = new SubscribeCallback() {
 
-
         @Override
         public void message(PubNub pubnub, PNMessageResult msg) {
             String msgText = msg.getMessage().asText();
-            String actualChannel = msg.getMessage().asText();
             long timeToken = msg.getTimetoken();
-
             log.debug("received message on channel: {0} of \n{1}", msg.getActualChannel(), msg.getMessage().asText());
+
             try {
                 ChatMessage chatMessage = ChatMessage.create(msgText, timeToken);
-                eventDispatcher.dispatchMessageReceived(actualChannel, chatMessage);
+                observableMessageStream.onNext(chatMessage);
+
             }catch(Exception e){
                 log.error("exception while attempting to dispatch received message",e);
             }
@@ -59,25 +116,20 @@ public class ChatServiceClient extends Binder {
 
         @Override
         public void status(PubNub pubnub, PNStatus status) {
-            if(status.isError()){
-                String[] channels = (String[])status.getAffectedChannels().toArray();
-                eventDispatcher.dispatchError(status.getAffectedChannels(),status.getErrorData().getInformation());
-            }
+            StatusEvent event = new StatusEvent();
+            event.setMessage(status.getCategory().name());
+            event.setType(status.getCategory().name());
+            statusEventStream.onNext(event);
 
         }
 
         @Override
         public void presence(PubNub pubnub, PNPresenceEventResult presence) {
-
-            log.info("successCallback for presence");
+            log.info("presence event received: " + presence.toString());
             String messageStr = presence.toString();
             PresenceMessage presenceMessage = PresenceMessage.create(messageStr);
-            eventDispatcher.dispatchPresenceEvent(presence.getActualChannel(), presenceMessage);
-
-
+            presenceEventStream.onNext(presenceMessage);
         }
-
-
     };
 
 
@@ -86,6 +138,7 @@ public class ChatServiceClient extends Binder {
 
     public ChatServiceClient(ChatService service) {
         chatService = service;
+        service.getPubNub().addListener(subscribeCallback);
     }
 
 
@@ -96,12 +149,10 @@ public class ChatServiceClient extends Binder {
         chatService.getPubNub().publish().message(messageString).channel(channel).async(new PNCallback<PNPublishResult>() {
             @Override
             public void onResponse(PNPublishResult result, PNStatus status) {
-                if(status.isError()){
-                    eventDispatcher.dispatchError(status.getAffectedChannels(),status.getErrorData().getInformation());
-                }else{
-
-                    eventDispatcher.dispathMessagePublished(channel,messageString);
-                }
+               StatusEvent statusEvent = new StatusEvent();
+                statusEvent.setType("message-published");
+                statusEvent.setError(status.isError());
+                statusEvent.setMessage(status.getErrorData().getInformation());
             }
         });
     }
@@ -173,7 +224,7 @@ public class ChatServiceClient extends Binder {
         }
     }
 
-    public void joinRoom(@NonNull final String roomName, final ChatRoomEventListener listener) {
+    public void joinRoom(@NonNull final String roomName, final Observer<ChatMessage> listener) {
         try {
 
             if (null != chatService.getPubNub()) {
@@ -186,28 +237,29 @@ public class ChatServiceClient extends Binder {
                                        .channels(channels)
                                        .state(userProfile).sync();
 
-                List<String> channelsList = new ArrayList<String>();
-                channelsList.add(roomName);
-                channelsList.add(userProfile.getUserName());
+
+                List<String>  channelList = Arrays.asList(roomName,userProfile.getUserName());
 
                 chatService.getPubNub().subscribe()
-                                      .withPresence()
-                                      .channels(channelsList).execute();
+                                       .withPresence()
+                                       .channels(channelList).execute();
 
-                eventDispatcher.addEventListener(roomName, listener);
+               observableMessageStream.subscribe(listener);
             }
         } catch (Exception e) { //DEMO only...bad
             log.error("Exception while attempting to register to listen to a room");
         }
     }
 
-    public void leaveRoom(String roomName, ChatRoomEventListener listener) {
-        eventDispatcher.removeEventListener(roomName, listener);
+    public void leaveRoom(String roomName, Subscriber<ChatMessage> listener) {
+
+
+        /*
         if (!eventDispatcher.hasEventListener(roomName)) {
             List<String> channelsList = new ArrayList<String>();
             channelsList.add(roomName);
             chatService.getPubNub().unsubscribe().channels(channelsList).execute();
-        }
+        }*/
     }
 
     public void logout() {

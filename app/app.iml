@@ -162,11 +162,10 @@
     <orderEntry type="library" exported="" name="play-services-appinvite-8.4.0" level="project" />
     <orderEntry type="library" exported="" name="jackson-core-2.7.3" level="project" />
     <orderEntry type="library" exported="" name="retrofit-2.0.2" level="project" />
-    <orderEntry type="library" exported="" name="slf4j-android-1.7.21" level="project" />
     <orderEntry type="library" exported="" name="jackson-databind-2.7.2" level="project" />
+    <orderEntry type="library" exported="" name="slf4j-android-1.7.21" level="project" />
     <orderEntry type="library" exported="" name="play-services-gcm-8.4.0" level="project" />
     <orderEntry type="library" exported="" name="lombok-1.12.6" level="project" />
-    <orderEntry type="library" exported="" name="dagger-2.2" level="project" />
     <orderEntry type="library" exported="" name="play-services-panorama-8.4.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-appindexing-8.4.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-plus-8.4.0" level="project" />
@@ -186,7 +185,6 @@
     <orderEntry type="library" exported="" name="gson-2.5" level="project" />
     <orderEntry type="library" exported="" name="play-services-appstate-8.4.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-games-8.4.0" level="project" />
-    <orderEntry type="library" exported="" name="javax.inject-1" level="project" />
     <orderEntry type="library" exported="" name="design-23.3.0" level="project" />
     <orderEntry type="library" exported="" name="mediarouter-v7-23.0.0" level="project" />
     <orderEntry type="library" exported="" name="logging-interceptor-3.2.0" level="project" />

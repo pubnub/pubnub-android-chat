@@ -4,16 +4,16 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-
 import android.os.IBinder;
 
 import com.pubnub.api.PNConfiguration;
 import com.pubnub.api.PubNub;
 
+import com.pubnub.api.callbacks.SubscribeCallback;
+
 import com.pubnub.chatterbox.BuildConfig;
 import com.pubnub.chatterbox.entity.UserProfile;
 import com.pubnub.chatterbox.service.client.ChatServiceClient;
-
 
 import lombok.Getter;
 import lombok.Setter;
@@ -44,7 +44,6 @@ public class ChatService extends Service {
 
 
     @Getter
-    @Setter
     private UserProfile userProfile;
 
 
@@ -71,6 +70,7 @@ public class ChatService extends Service {
             pubnub = new PubNub(configuration);
 
 
+
         }
         return pubnub;
     }
@@ -86,6 +86,7 @@ public class ChatService extends Service {
     public IBinder onBind(Intent intent) {
         if (null == client) {
             client = new ChatServiceClient(this);
+
         }
         return client;
     }

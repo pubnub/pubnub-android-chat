@@ -1,14 +1,13 @@
 package com.pubnub.chatterbox.entity;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.io.Serializable;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-
-import com.google.android.gms.gcm.GcmListenerService;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 @Getter
 @Setter

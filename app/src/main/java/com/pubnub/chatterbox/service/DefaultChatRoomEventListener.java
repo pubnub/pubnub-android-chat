@@ -3,6 +3,10 @@ package com.pubnub.chatterbox.service;
 import com.pubnub.chatterbox.entity.ChatMessage;
 import com.pubnub.chatterbox.entity.PresenceMessage;
 
+
+/**
+ * @Deprecated
+ */
 public class DefaultChatRoomEventListener implements ChatRoomEventListener {
 
     @Override

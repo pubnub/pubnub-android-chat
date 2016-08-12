@@ -3,11 +3,9 @@ package com.pubnub.chatterbox;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -17,7 +15,6 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -34,7 +31,6 @@ import com.google.android.gms.iid.InstanceID;
 import com.pubnub.chatterbox.entity.Room;
 import com.pubnub.chatterbox.entity.UserProfile;
 import com.pubnub.chatterbox.service.ChatService;
-import com.pubnub.chatterbox.service.PushNotificationListenerService;
 import com.pubnub.chatterbox.service.RegistrationIntentService;
 import com.pubnub.chatterbox.service.client.ChatServiceClient;
 import com.pubnub.chatterbox.ui.SessionMediator;
@@ -43,8 +39,6 @@ import com.pubnub.chatterbox.ui.fragments.PresenceListFragment;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -57,6 +51,7 @@ public class ChatterBoxMainActivity extends AppCompatActivity  {
 
     @Getter
     private ChatServiceClient chatServiceClient;
+
     @Getter
     private PresenceListFragment presenceListFragment;
 
@@ -105,7 +100,7 @@ public class ChatterBoxMainActivity extends AppCompatActivity  {
     public void changeRooms(@NonNull  Room room) {
 
 
-        presenceListFragment = PresenceListFragment.newInstance(room);
+        presenceListFragment = PresenceListFragment.newInstance(room, chatServiceClient);
         FragmentManager fm = getFragmentManager();
         FragmentTransaction fragmentTransaction = fm.beginTransaction();
         fragmentTransaction.replace(R.id.whos_online_fragment_container, presenceListFragment);
@@ -285,15 +280,14 @@ public class ChatterBoxMainActivity extends AppCompatActivity  {
 
     private void addRoom(String roomName, String roomTitle) {
         //Load up the Message View
-        Room room = new Room();
-        room.setName(roomName);
-        room.setTitle(roomTitle);
-        room.setActive(true);
-
+        Room room = new Room().builder().roomID(roomName)
+                                        .name(roomName)
+                                        .chatServiceClient(chatServiceClient).build();
 
 
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
         ChatRoomFragment roomFragment = ChatRoomFragment.newInstance(room, chatServiceClient);
         fragmentTransaction.replace(R.id.room_fragment_container, roomFragment);
         fragmentTransaction.commit();

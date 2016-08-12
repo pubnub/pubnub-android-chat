@@ -9,51 +9,65 @@ import android.view.ViewGroup;
 
 import com.pubnub.chatterbox.Constants;
 import com.pubnub.chatterbox.R;
+import com.pubnub.chatterbox.entity.ChatMessage;
 import com.pubnub.chatterbox.entity.Room;
-import com.pubnub.chatterbox.service.ChatRoomEventListener;
-import com.pubnub.chatterbox.service.DefaultChatRoomEventListener;
 import com.pubnub.chatterbox.service.client.ChatServiceClient;
 
 import butterknife.ButterKnife;
-import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import rx.Observer;
 
 
 @Slf4j
-public class ChatRoomFragment extends BaseChatterboxFragment {
+public class ChatRoomFragment extends BaseChatterboxFragment implements Observer<ChatMessage> {
 
     @Setter
-    MessageSendFragment chatterBoxMessageSendFragment;
+    MessageSendFragment messageSendFragment;
     @Setter
-    MessageListFragment chatterBoxMessageListFragment;
+    MessageListFragment messageListFragment;
 
+    @Override
+    public void onNext(ChatMessage chatMessage) {
+        log.debug("received a chat message");
+    }
 
+    @Override
+    public void onError(Throwable e) {
+        log.error("throwable caught");
+    }
+
+    @Override
+    public void onCompleted() {
+        log.debug("on completed");
+
+    }
 
     private void configureRoom() {
         //Load up the Message View
         FragmentManager fragmentManager = getFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.message_display_fragment_container, chatterBoxMessageListFragment);
-        fragmentTransaction.replace(R.id.message_input_fragment_container, chatterBoxMessageSendFragment);
+        fragmentTransaction.replace(R.id.message_display_fragment_container, messageListFragment);
+        fragmentTransaction.replace(R.id.message_input_fragment_container, messageSendFragment);
         fragmentTransaction.commit();
 
         getChatServiceClient().joinRoom(Constants.MAIN_CHAT_ROOM, createListener());
     }
 
     public static ChatRoomFragment newInstance(Room room, ChatServiceClient client) {
+
         ChatRoomFragment fragment = new ChatRoomFragment();
         fragment.setChatServiceClient(client);
         fragment.setRoom(room);
-        fragment.setChatterBoxMessageListFragment(MessageListFragment.newInstance(room, client));
-        fragment.setChatterBoxMessageSendFragment(MessageSendFragment.newInstance(room, client));
+        fragment.setMessageListFragment(MessageListFragment.newInstance(room, client));
+        fragment.setMessageSendFragment(MessageSendFragment.newInstance(room, client));
         return fragment;
     }
 
     @Override
-    public ChatRoomEventListener createListener() {
+    public Observer<ChatMessage> createListener() {
         log.debug("creating default listener");
-        return new DefaultChatRoomEventListener();
+        return this;
     }
 
     @Override
@@ -64,6 +78,7 @@ public class ChatRoomFragment extends BaseChatterboxFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
             View view = inflater.inflate(R.layout.fragment_chatter_box_room, container, false);
             ButterKnife.bind(this,view);
             configureRoom();

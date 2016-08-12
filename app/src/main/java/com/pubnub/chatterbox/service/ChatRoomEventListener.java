@@ -12,6 +12,7 @@ import com.pubnub.chatterbox.entity.PresenceMessage;
  * is invoked when significant events occur.
  * <p/>
  * support@pubnub.com
+ * @Deprecated using RxJava and Futures
  */
 public interface ChatRoomEventListener {
 

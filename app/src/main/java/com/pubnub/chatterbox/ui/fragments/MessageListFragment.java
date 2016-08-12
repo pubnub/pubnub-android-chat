@@ -10,16 +10,14 @@ import com.pubnub.chatterbox.ChatMessageListArrayAdapter;
 import com.pubnub.chatterbox.R;
 import com.pubnub.chatterbox.entity.ChatMessage;
 import com.pubnub.chatterbox.entity.Room;
-import com.pubnub.chatterbox.service.ChatRoomEventListener;
-import com.pubnub.chatterbox.service.DefaultChatRoomEventListener;
 import com.pubnub.chatterbox.service.client.ChatServiceClient;
 
 import java.util.ArrayList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-
 import lombok.extern.slf4j.Slf4j;
+import rx.Observer;
 
 @Slf4j
 public class MessageListFragment extends BaseChatterboxFragment {
@@ -33,26 +31,31 @@ public class MessageListFragment extends BaseChatterboxFragment {
     private ChatMessageListArrayAdapter mAdapter;
 
     @Override
-    public ChatRoomEventListener createListener() {
-        return  new DefaultChatRoomEventListener() {
+    public Observer<ChatMessage> createListener() {
+
+        return new Observer<ChatMessage>() {
             @Override
-            public void messageReceived(ChatMessage message) {
-                log.info("received a message");
-                final ChatMessage fmsg = message;
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        mAdapter.add(fmsg);
-                    }
-                });
+            public void onCompleted() {
+
             }
 
             @Override
-            public void errorReceived(String message) {
-                log.info("error while listening for message");
+            public void onError(Throwable e) {
+                log.debug("error received from Observable");
+            }
+
+            @Override
+            public void onNext(ChatMessage chatMessage) {
+                final ChatMessage fmsg = chatMessage;
+                getActivity().runOnUiThread(new Runnable() {
+                    public void run(){
+                       mAdapter.add(fmsg);;
+                    };
+                });
             }
         };
-    }
+    };
+
 
     public MessageListFragment() {
         super();

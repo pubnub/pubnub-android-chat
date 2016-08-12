@@ -1,5 +1,6 @@
 package com.pubnub.chatterbox.ui.fragments;
 
+import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -9,73 +10,78 @@ import android.widget.AbsListView;
 
 import com.pubnub.chatterbox.R;
 import com.pubnub.chatterbox.entity.PresenceMessage;
-import com.pubnub.chatterbox.entity.UserProfile;
-
 import com.pubnub.chatterbox.entity.Room;
-import com.pubnub.chatterbox.service.ChatRoomEventListener;
-import com.pubnub.chatterbox.service.DefaultChatRoomEventListener;
+import com.pubnub.chatterbox.entity.UserProfile;
+import com.pubnub.chatterbox.service.client.ChatServiceClient;
 
 import java.util.ArrayList;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import rx.functions.Func1;
 
 
 @Slf4j(topic = "PresenceListFragment")
-public class PresenceListFragment extends BaseChatterboxFragment {
+public class PresenceListFragment extends Fragment {
 
     @Getter
     private ArrayList<UserProfile> presentUserProfiles = new ArrayList<>();
+
     private PresenceListArrayAdapter presenceListArrayAdapter;
+
+    @Setter
+    private ChatServiceClient chatServiceClient;
+
+    @Setter
+    private Room room;
 
 
     @Bind(android.R.id.list)
     AbsListView presenceListView;
 
-    @Override
-    public ChatRoomEventListener createListener() {
-        return new DefaultChatRoomEventListener() {
 
-            @Override
-            public void presenceEventReceived(final PresenceMessage pmessage) {
-                try {
-                    log.trace("Presence event triggered for:\n {0}", pmessage);
-                    UserProfile targetProfile = null;
-                    for (UserProfile userProfile : presentUserProfiles) {
-                        if (userProfile.getId().equals(pmessage.getUuid())) {
-                            targetProfile = userProfile;
-                            break;
-                        }
+    private Func1<PresenceMessage, Void> presenceHandler = new Func1<PresenceMessage, Void>() {
+        @Override
+        public Void call(PresenceMessage presenceMessage) {
+            try {
+                log.trace("Presence event triggered for:\n {0}", presenceMessage);
+                UserProfile targetProfile = null;
+                for (UserProfile userProfile : presentUserProfiles) {
+                    if (userProfile.getId().equals(presenceMessage.getUuid())) {
+                        targetProfile = userProfile;
+                        break;
                     }
-
-                    if ((!pmessage.getActionType().equals("leave")) ||
-                            (pmessage.getActionType().equals("timeout"))) {
-                        presenceListArrayAdapter.remove(targetProfile);
-                    } else if (!pmessage.getActionType().equals("join")) {
-
-                    }
-
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            //presenceListArrayAdapter.add(pmessage.getTargetProfile());
-                        }
-                    });
-
-                } catch (Exception e) {
-                    log.error("Exception while executing presence callback", e);
                 }
+
+                if ((!presenceMessage.getActionType().equals("leave")) ||
+                        (presenceMessage.getActionType().equals("timeout"))) {
+                    presenceListArrayAdapter.remove(targetProfile);
+                } else if (!presenceMessage.getActionType().equals("join")) {
+
+                }
+
+
+                presenceListArrayAdapter.add(targetProfile);
+
+
+            } catch (Exception e) {
+                log.error("Exception while executing presence callback", e);
             }
-        };
-    }
+
+            return null;
+        }
+    };
 
 
 
-    public static PresenceListFragment newInstance(Room room) {
+    public static PresenceListFragment newInstance(Room room, ChatServiceClient client) {
         PresenceListFragment fragment = new PresenceListFragment();
+        fragment.setChatServiceClient(client);
         fragment.setRoom(room);
+        client.presence(fragment.presenceHandler);
         return fragment;
     }
 

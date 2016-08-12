@@ -18,7 +18,8 @@ import lombok.extern.slf4j.Slf4j;
 public class ChatMessage {
     private static Gson gson = new GsonBuilder().create();
 
-    private String type = "chattmessage";
+    private String type = "chatmessage";
+
     private String ID;
     private String content;
     private String conversation;
@@ -27,6 +28,7 @@ public class ChatMessage {
     private String deviceTag;
     private String emoticon;
     private String senderUUID;
+    private String room;
 
 
     public static ChatMessage create() {
