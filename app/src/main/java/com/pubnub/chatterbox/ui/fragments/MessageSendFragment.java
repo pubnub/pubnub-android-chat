@@ -85,7 +85,7 @@ public class MessageSendFragment extends Fragment {
         MessageSendFragment fragment = new MessageSendFragment();
         fragment.setChatServiceClient(client);
         fragment.setRoom(room);
-        client.status(fragment.statusEventCallable);
+        client.statusObserved(fragment.statusEventCallable);
         return fragment;
     }
 

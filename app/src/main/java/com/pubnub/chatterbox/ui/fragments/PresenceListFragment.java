@@ -81,7 +81,7 @@ public class PresenceListFragment extends Fragment {
         PresenceListFragment fragment = new PresenceListFragment();
         fragment.setChatServiceClient(client);
         fragment.setRoom(room);
-        client.presence(fragment.presenceHandler);
+        client.presenceObserved(fragment.presenceHandler);
         return fragment;
     }
 

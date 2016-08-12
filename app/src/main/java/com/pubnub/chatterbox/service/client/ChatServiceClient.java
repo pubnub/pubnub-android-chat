@@ -12,6 +12,8 @@ import com.pubnub.api.enums.PNPushType;
 import com.pubnub.api.models.consumer.PNPublishResult;
 import com.pubnub.api.models.consumer.PNStatus;
 import com.pubnub.api.models.consumer.history.PNHistoryResult;
+import com.pubnub.api.models.consumer.presence.PNGetStateResult;
+import com.pubnub.api.models.consumer.presence.PNSetStateResult;
 import com.pubnub.api.models.consumer.pubsub.PNMessageResult;
 import com.pubnub.api.models.consumer.pubsub.PNPresenceEventResult;
 import com.pubnub.api.models.consumer.push.PNPushAddChannelResult;
@@ -27,6 +29,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -56,12 +59,7 @@ public class ChatServiceClient extends Binder {
 
 
 
-
-
-
-
-
-    public void messages(final Func1<ChatMessage,Void> chatMessageResponder){
+    public void messageObserved(final Func1<ChatMessage,Void> chatMessageResponder){
         Subscriber<ChatMessage> s = Subscribers.create(new Action1<ChatMessage>() {
             @Override
             public void call(ChatMessage chatMessage) {
@@ -73,7 +71,7 @@ public class ChatServiceClient extends Binder {
     }
 
 
-    public void presence(final Func1<PresenceMessage, Void> presenceEventResponder){
+    public void presenceObserved(final Func1<PresenceMessage, Void> presenceEventResponder){
         Subscriber<PresenceMessage> s = Subscribers.create(new Action1<PresenceMessage>() {
             @Override
             public void call(PresenceMessage presenceMessage) {
@@ -84,7 +82,7 @@ public class ChatServiceClient extends Binder {
         presenceEventStream.subscribe(s);
     }
 
-    public void status(final Func1<StatusEvent,Void> statusEventResponder){
+    public void statusObserved(final Func1<StatusEvent,Void> statusEventResponder){
         Subscriber<StatusEvent> s = Subscribers.create(new Action1<StatusEvent>() {
             @Override
             public void call(StatusEvent statusEvent) {
@@ -124,10 +122,29 @@ public class ChatServiceClient extends Binder {
         }
 
         @Override
-        public void presence(PubNub pubnub, PNPresenceEventResult presence) {
-            log.info("presence event received: " + presence.toString());
-            String messageStr = presence.toString();
-            PresenceMessage presenceMessage = PresenceMessage.create(messageStr);
+        public void presence(PubNub pubnub, PNPresenceEventResult pevent) {
+            log.info("presence event received: " + pevent.toString());
+            String event = pevent.getEvent();
+
+            if(pevent.getEvent().equals("join")){
+                List<String> channels = Arrays.asList(pevent.getActualChannel());
+                try {
+                    PNGetStateResult result = pubnub.getPresenceState()
+                                                    .uuid(pevent.getUuid())
+                                                    .channels(channels)
+                                                    .sync();
+
+                    Map<String,Object> uuidState = result.getStateByUUID();
+                    //process state attributes
+
+
+                }catch(PubNubException e){
+                    log.error("exception attempting to get state during join event",e);
+                }
+            }
+
+
+            PresenceMessage presenceMessage = PresenceMessage.create(pevent.toString());
             presenceEventStream.onNext(presenceMessage);
         }
     };
@@ -146,10 +163,14 @@ public class ChatServiceClient extends Binder {
         final String messageString = ChatMessage.toJSON(message);
         log.debug("message: " + messageString);
 
-        chatService.getPubNub().publish().message(messageString).channel(channel).async(new PNCallback<PNPublishResult>() {
+        chatService.getPubNub().publish()
+                               .message(messageString)
+                               .channel(channel)
+                               .async(new PNCallback<PNPublishResult>() {
             @Override
             public void onResponse(PNPublishResult result, PNStatus status) {
-               StatusEvent statusEvent = new StatusEvent();
+
+                StatusEvent statusEvent = new StatusEvent();
                 statusEvent.setType("message-published");
                 statusEvent.setError(status.isError());
                 statusEvent.setMessage(status.getErrorData().getInformation());
